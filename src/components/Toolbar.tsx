@@ -5,13 +5,13 @@ import { useAppStore } from '@/store/app-store'
 
 const themes: ThemeId[] = ['obsidian', 'paper', 'midnight', 'solar', 'forest']
 
-export function Toolbar({ onAi, onPlugins }: { onAi(): void; onPlugins(): void }) {
+export function Toolbar({ onAi, onPlugins, onSettings, onToggleSidebar, sidebarOpen }: { onAi(): void; onPlugins(): void; onSettings(): void; onToggleSidebar(): void; sidebarOpen: boolean }) {
   const { activeFile, content, savedContent, settings, save, updateSettings } = useAppStore()
   const dirty = content !== savedContent
-  const setMode = (editorMode: EditorMode) => updateSettings({ editorMode })
+  const setMode = (editorMode: EditorMode) => updateSettings({ editorMode, ...(editorMode === 'split' ? { splitRatio: 50 } : {}) })
   return <header className="titlebar-drag flex h-14 shrink-0 items-center justify-between border-b bg-background/72 px-4 backdrop-blur-xl">
     <div className="flex min-w-0 items-center gap-3">
-      <div className="rounded-xl border bg-card p-2 shadow-glow"><PanelLeftClose className="h-4 w-4 text-primary" /></div>
+      <button title={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'} className="titlebar-no-drag rounded-xl border bg-card p-2 shadow-glow hover:bg-muted" onClick={onToggleSidebar}><PanelLeftClose className="h-4 w-4 text-primary" /></button>
       <div className="min-w-0">
         <div className="truncate text-sm font-semibold">{activeFile ? basename(activeFile) : 'Choose or create a note'}</div>
         <div className="text-xs text-muted-foreground">{wordCount(content)} words {dirty ? '• unsaved' : '• saved'}</div>
@@ -31,7 +31,7 @@ export function Toolbar({ onAi, onPlugins }: { onAi(): void; onPlugins(): void }
       <button className="rounded-xl border bg-card px-3 py-2 text-sm hover:bg-muted" onClick={onPlugins}><GitBranch className="mr-1.5 inline h-4 w-4 text-primary" />Plugins</button>
       <button className="rounded-xl border bg-card px-3 py-2 text-sm hover:bg-muted" onClick={() => updateSettings({ syncScroll: !settings?.syncScroll })}><Wand2 className="mr-1.5 inline h-4 w-4" />Sync {settings?.syncScroll ? 'on' : 'off'}</button>
       <button className="rounded-xl bg-primary px-3 py-2 text-sm text-primary-foreground disabled:opacity-45" disabled={!activeFile || !dirty} onClick={save}><Save className="mr-1.5 inline h-4 w-4" />Save</button>
-      <Settings className="h-4 w-4 text-muted-foreground" />
+      <button title="Settings" className="rounded-xl border bg-card p-2 hover:bg-muted" onClick={onSettings}><Settings className="h-4 w-4 text-muted-foreground" /></button>
     </div>
   </header>
 }
