@@ -32,7 +32,28 @@ export async function readTree(root: string): Promise<FileNode[]> {
 
 export async function readFile(filePath: string) { return fs.readFile(filePath, 'utf8') }
 export async function saveFile(filePath: string, content: string) { await fs.writeFile(filePath, content, 'utf8') }
-export async function createEntry(input: CreateEntryInput) { const target = path.join(input.parentPath, input.name); if (input.kind === 'folder') await fs.mkdir(target, { recursive: true }); else await fs.writeFile(target.endsWith('.md') ? target : `${target}.md`, '', { flag: 'wx' }) }
+async function uniquePath(target: string) {
+  const parsed = path.parse(target)
+  let candidate = target
+  let index = 2
+  while (true) {
+    try {
+      await fs.access(candidate)
+      candidate = path.join(parsed.dir, `${parsed.name} ${index}${parsed.ext}`)
+      index += 1
+    } catch {
+      return candidate
+    }
+  }
+}
+
+export async function createEntry(input: CreateEntryInput) {
+  const requested = path.join(input.parentPath, input.name)
+  const target = await uniquePath(input.kind === 'file' && !requested.match(/\.(md|markdown|mdx|txt)$/i) ? `${requested}.md` : requested)
+  if (input.kind === 'folder') await fs.mkdir(target, { recursive: false })
+  else await fs.writeFile(target, '', { flag: 'wx' })
+  return target
+}
 export async function renameEntry(input: RenameEntryInput) { await fs.rename(input.path, path.join(path.dirname(input.path), input.nextName)) }
 export async function deleteEntry(input: DeleteEntryInput) { await fs.rm(input.path, { recursive: true, force: false }) }
 export function assertInsideWorkspace(workspacePath: string, target: string) { const rel = path.relative(workspacePath, target); if (rel.startsWith('..') || path.isAbsolute(rel)) throw new Error('Target is outside workspace') }

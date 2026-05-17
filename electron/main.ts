@@ -35,7 +35,7 @@ ipcMain.handle('workspace:tree', async (_event, id: string) => readTree(workspac
 ipcMain.handle('workspace:remove', async (_event, id: string) => { db.removeWorkspace(id); return db.listWorkspaces() })
 ipcMain.handle('file:read', async (_event, workspaceId: string, filePath: string) => { const root = workspacePath(workspaceId); assertInsideWorkspace(root, filePath); return readFile(filePath) })
 ipcMain.handle('file:save', async (_event, input: SaveFileInput) => { const root = workspacePath(input.workspaceId); assertInsideWorkspace(root, input.path); await saveFile(input.path, input.content); return true })
-ipcMain.handle('entry:create', async (_event, input: CreateEntryInput) => { const root = workspacePath(input.workspaceId); assertInsideWorkspace(root, input.parentPath); await createEntry(input); return true })
+ipcMain.handle('entry:create', async (_event, input: CreateEntryInput) => { const root = workspacePath(input.workspaceId); assertInsideWorkspace(root, input.parentPath); return createEntry(input) })
 ipcMain.handle('entry:rename', async (_event, input: RenameEntryInput) => { const root = workspacePath(input.workspaceId); assertInsideWorkspace(root, input.path); await renameEntry(input); return true })
 ipcMain.handle('entry:delete', async (_event, input: DeleteEntryInput) => { const root = workspacePath(input.workspaceId); assertInsideWorkspace(root, input.path); await deleteEntry(input); return true })
 ipcMain.handle('settings:get', () => db.getSettings())

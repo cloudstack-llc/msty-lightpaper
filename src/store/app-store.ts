@@ -13,6 +13,8 @@ type State = {
   settings?: AppSettings
   plugins: PluginRecord[]
   loading: boolean
+  lastError?: string
+  lastAction?: string
   setActiveFile(path?: string): void
   setContent(content: string): void
   hydrate(): Promise<void>
@@ -33,7 +35,9 @@ function isInside(root: string, target: string) {
 }
 
 function findWorkspaceForPath(workspaces: Workspace[], targetPath: string) {
-  return [...workspaces].sort((a, b) => b.path.length - a.path.length).find((workspace) => isInside(workspace.path, targetPath))
+  return [...workspaces]
+    .sort((a, b) => b.path.length - a.path.length)
+    .find((workspace) => isInside(workspace.path, targetPath))
 }
 
 function replaceTree(trees: WorkspaceTree[], workspace: Workspace, patch: Partial<WorkspaceTree>) {
@@ -42,44 +46,133 @@ function replaceTree(trees: WorkspaceTree[], workspace: Workspace, patch: Partia
   return [...trees, { workspace, tree: [], ...patch }]
 }
 
+function errorMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error || 'Unknown error')
+}
+
+function basename(filePath: string) {
+  return filePath.split('/').pop() ?? filePath
+}
+
+function relativePath(root: string, target: string) {
+  return target === root ? '' : target.slice(root.length + 1)
+}
+
+function nodeFromPath(workspace: Workspace, filePath: string, kind: 'file' | 'folder'): FileNode {
+  return {
+    id: filePath,
+    name: basename(filePath),
+    path: filePath,
+    relativePath: relativePath(workspace.path, filePath),
+    kind,
+    children: kind === 'folder' ? [] : undefined,
+  }
+}
+
+function sortNodes(nodes: FileNode[]) {
+  return [...nodes].sort((a, b) => (a.kind === b.kind ? a.name.localeCompare(b.name) : a.kind === 'folder' ? -1 : 1))
+}
+
+function addNodeToTree(nodes: FileNode[], parentPath: string, node: FileNode): FileNode[] {
+  return sortNodes(nodes.map((item) => {
+    if (item.path === parentPath && item.kind === 'folder') {
+      return { ...item, children: sortNodes([...(item.children ?? []), node]) }
+    }
+    if (item.kind === 'folder' && item.children) {
+      return { ...item, children: addNodeToTree(item.children, parentPath, node) }
+    }
+    return item
+  }))
+}
+
+function addNodeToWorkspaceTree(tree: FileNode[], workspace: Workspace, parentPath: string, node: FileNode) {
+  if (parentPath === workspace.path) return sortNodes([...tree, node])
+  return addNodeToTree(tree, parentPath, node)
+}
+
+function removeNodeFromTree(nodes: FileNode[], targetPath: string): FileNode[] {
+  return nodes
+    .filter((item) => item.path !== targetPath)
+    .map((item) => item.kind === 'folder' && item.children ? { ...item, children: removeNodeFromTree(item.children, targetPath) } : item)
+}
+
+function mutateWorkspaceTree(trees: WorkspaceTree[], workspace: Workspace, mutator: (tree: FileNode[]) => FileNode[]) {
+  return trees.map((item) => item.workspace.id === workspace.id ? { ...item, tree: mutator(item.tree), loading: false, error: undefined } : item)
+}
+
 export const useAppStore = create<State>((set, get) => ({
-  workspaces: [], workspaceTrees: [], content: '', savedContent: '', plugins: [], loading: false,
+  workspaces: [],
+  workspaceTrees: [],
+  content: '',
+  savedContent: '',
+  plugins: [],
+  loading: false,
   setActiveFile: (path) => set({ activeFile: path }),
   setContent: (content) => set({ content }),
   hydrate: async () => {
-    set({ loading: true })
-    const [workspaces, settings, plugins] = await Promise.all([window.lightpaper.listWorkspaces(), window.lightpaper.getSettings(), window.lightpaper.seedPlugins()]) as [Workspace[], AppSettings, PluginRecord[]]
-    set({ workspaces, settings, plugins, activeWorkspace: workspaces[0], workspaceTrees: workspaces.map((workspace) => ({ workspace, tree: [], loading: true })), loading: false })
+    set({ loading: true, lastError: undefined })
+    const [workspaces, settings, plugins] = await Promise.all([
+      window.lightpaper.listWorkspaces(),
+      window.lightpaper.getSettings(),
+      window.lightpaper.seedPlugins(),
+    ]) as [Workspace[], AppSettings, PluginRecord[]]
+    set({
+      workspaces,
+      settings,
+      plugins,
+      activeWorkspace: workspaces[0],
+      workspaceTrees: workspaces.map((workspace) => ({ workspace, tree: [], loading: true })),
+      loading: false,
+    })
     await get().loadAllTrees()
   },
   addWorkspace: async () => {
-    const ws = await window.lightpaper.addWorkspace()
-    if (!ws) return
-    const workspaces = await window.lightpaper.listWorkspaces() as Workspace[]
-    set({ workspaces, activeWorkspace: ws, workspaceTrees: workspaces.map((workspace) => get().workspaceTrees.find((item) => item.workspace.id === workspace.id) ?? { workspace, tree: [], loading: true }) })
-    await get().loadTree(ws)
+    try {
+      const ws = await window.lightpaper.addWorkspace() as Workspace | undefined
+      if (!ws) return
+      const workspaces = await window.lightpaper.listWorkspaces() as Workspace[]
+      set({
+        workspaces,
+        activeWorkspace: ws,
+        workspaceTrees: workspaces.map((workspace) => get().workspaceTrees.find((item) => item.workspace.id === workspace.id) ?? { workspace, tree: [], loading: true }),
+        lastAction: `Mounted ${ws.name}`,
+        lastError: undefined,
+      })
+      await get().loadTree(ws)
+    } catch (error) {
+      set({ lastError: `Mount failed: ${errorMessage(error)}` })
+    }
   },
   removeWorkspace: async (id) => {
     const workspace = get().workspaces.find((item) => item.id === id)
     if (!workspace) return
     if (!window.confirm(`Remove ${workspace.name} from LightPaper? Files stay on disk.`)) return
-    const workspaces = await window.lightpaper.removeWorkspace(id) as Workspace[]
-    const activeFile = get().activeFile
-    const activeFileWasInsideRemovedWorkspace = activeFile ? isInside(workspace.path, activeFile) : false
-    set({
-      workspaces,
-      workspaceTrees: get().workspaceTrees.filter((item) => item.workspace.id !== id),
-      activeWorkspace: activeFileWasInsideRemovedWorkspace ? workspaces[0] : get().activeWorkspace?.id === id ? workspaces[0] : get().activeWorkspace,
-      ...(activeFileWasInsideRemovedWorkspace ? { activeFile: undefined, content: '', savedContent: '' } : {}),
-    })
+    try {
+      const workspaces = await window.lightpaper.removeWorkspace(id) as Workspace[]
+      const activeFile = get().activeFile
+      const activeFileWasInsideRemovedWorkspace = activeFile ? isInside(workspace.path, activeFile) : false
+      set({
+        workspaces,
+        workspaceTrees: get().workspaceTrees.filter((item) => item.workspace.id !== id),
+        activeWorkspace: activeFileWasInsideRemovedWorkspace ? workspaces[0] : get().activeWorkspace?.id === id ? workspaces[0] : get().activeWorkspace,
+        lastAction: `Unmounted ${workspace.name}`,
+        lastError: undefined,
+        ...(activeFileWasInsideRemovedWorkspace ? { activeFile: undefined, content: '', savedContent: '' } : {}),
+      })
+    } catch (error) {
+      set({ lastError: `Unmount failed: ${errorMessage(error)}` })
+    }
   },
   loadTree: async (workspace) => {
     set({ workspaceTrees: replaceTree(get().workspaceTrees, workspace, { loading: true, error: undefined }) })
     try {
-      const tree = await window.lightpaper.readTree(workspace.id)
+      const tree = await window.lightpaper.readTree(workspace.id) as FileNode[]
       set({ workspaceTrees: replaceTree(get().workspaceTrees, workspace, { tree, loading: false, error: undefined }) })
     } catch (error) {
-      set({ workspaceTrees: replaceTree(get().workspaceTrees, workspace, { loading: false, error: error instanceof Error ? error.message : 'Unable to load folder' }) })
+      set({
+        workspaceTrees: replaceTree(get().workspaceTrees, workspace, { loading: false, error: errorMessage(error) }),
+        lastError: `Unable to load ${workspace.name}: ${errorMessage(error)}`,
+      })
     }
   },
   loadAllTrees: async () => {
@@ -87,38 +180,63 @@ export const useAppStore = create<State>((set, get) => ({
   },
   openFile: async (path) => {
     const workspace = findWorkspaceForPath(get().workspaces, path)
-    if (!workspace) return
-    const content = await window.lightpaper.readFile(workspace.id, path)
-    set({ activeWorkspace: workspace, activeFile: path, content, savedContent: content })
+    if (!workspace) return set({ lastError: `No mounted folder owns ${path}` })
+    try {
+      const content = await window.lightpaper.readFile(workspace.id, path) as string
+      set({ activeWorkspace: workspace, activeFile: path, content, savedContent: content, lastAction: `Opened ${basename(path)}`, lastError: undefined })
+    } catch (error) {
+      set({ lastError: `Open failed: ${errorMessage(error)}` })
+    }
   },
   save: async () => {
     const { workspaces, activeFile, content } = get()
     if (!activeFile) return
     const workspace = findWorkspaceForPath(workspaces, activeFile)
-    if (!workspace) return
-    await window.lightpaper.saveFile({ workspaceId: workspace.id, path: activeFile, content })
-    set({ activeWorkspace: workspace, savedContent: content })
-    await get().loadTree(workspace)
+    if (!workspace) return set({ lastError: `No mounted folder owns ${activeFile}` })
+    try {
+      await window.lightpaper.saveFile({ workspaceId: workspace.id, path: activeFile, content })
+      set({ activeWorkspace: workspace, savedContent: content, lastAction: `Saved ${basename(activeFile)}`, lastError: undefined })
+    } catch (error) {
+      set({ lastError: `Save failed: ${errorMessage(error)}` })
+    }
   },
   createEntry: async (parentPath, kind) => {
     const workspace = findWorkspaceForPath(get().workspaces, parentPath)
-    if (!workspace) return
-    const base = kind === 'folder' ? 'New Folder' : 'Untitled.md'
-    const name = window.prompt(`Name for new ${kind}`, base)
-    if (!name) return
-    await window.lightpaper.createEntry({ workspaceId: workspace.id, parentPath, name, kind })
-    set({ activeWorkspace: workspace })
-    await get().loadTree(workspace)
+    if (!workspace) return set({ lastError: `No mounted folder owns ${parentPath}` })
+    const name = kind === 'folder' ? 'New Folder' : 'Untitled.md'
+    set({ lastAction: `Creating ${kind}…`, lastError: undefined })
+    try {
+      const createdPath = await window.lightpaper.createEntry({ workspaceId: workspace.id, parentPath, name, kind }) as string
+      const newNode = nodeFromPath(workspace, createdPath, kind)
+      set({
+        activeWorkspace: workspace,
+        lastAction: `Created ${basename(createdPath)}`,
+        lastError: undefined,
+        workspaceTrees: mutateWorkspaceTree(get().workspaceTrees, workspace, (tree) => addNodeToWorkspaceTree(tree, workspace, parentPath, newNode)),
+      })
+      if (kind === 'file') await get().openFile(createdPath)
+    } catch (error) {
+      set({ lastError: `Create ${kind} failed: ${errorMessage(error)}` })
+    }
   },
   deleteEntry: async (path) => {
     const workspace = findWorkspaceForPath(get().workspaces, path)
-    if (!workspace) return
+    if (!workspace) return set({ lastError: `No mounted folder owns ${path}` })
     if (!window.confirm('Delete this item from disk?')) return
-    await window.lightpaper.deleteEntry({ workspaceId: workspace.id, path })
-    const { activeFile } = get()
-    if (activeFile && isInside(path, activeFile)) set({ activeFile: undefined, content: '', savedContent: '' })
-    set({ activeWorkspace: workspace })
-    await get().loadTree(workspace)
+    try {
+      await window.lightpaper.deleteEntry({ workspaceId: workspace.id, path })
+      const { activeFile } = get()
+      const clearActiveFile = activeFile ? isInside(path, activeFile) : false
+      set({
+        activeWorkspace: workspace,
+        lastAction: `Deleted ${basename(path)}`,
+        lastError: undefined,
+        workspaceTrees: mutateWorkspaceTree(get().workspaceTrees, workspace, (tree) => removeNodeFromTree(tree, path)),
+        ...(clearActiveFile ? { activeFile: undefined, content: '', savedContent: '' } : {}),
+      })
+    } catch (error) {
+      set({ lastError: `Delete failed: ${errorMessage(error)}` })
+    }
   },
   updateSettings: async (next) => {
     const current = get().settings

@@ -11,7 +11,7 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose(): voi
         <div className="flex items-center gap-2 font-semibold"><Settings className="h-4 w-4 text-primary" /> Settings</div>
         <p className="text-xs text-muted-foreground">Small knobs. Large consequences.</p>
       </div>
-      <button className="rounded-md p-1 hover:bg-muted" onClick={onClose}><X className="h-4 w-4" /></button>
+      <button type="button" className="rounded-md p-1 hover:bg-muted" onClick={onClose}><X className="h-4 w-4" /></button>
     </div>
     <div className="space-y-4 p-4">
       <label className="block space-y-2">
@@ -29,7 +29,7 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose(): voi
         </span>
         <input type="checkbox" checked={settings.syncScroll} onChange={(e) => updateSettings({ syncScroll: e.target.checked })} />
       </label>
-      <button className="w-full rounded-xl border px-3 py-2 text-sm hover:bg-muted" onClick={() => updateSettings({ splitRatio: 50 })}>Reset split to 50/50</button>
+      <button type="button" className="w-full rounded-xl border px-3 py-2 text-sm hover:bg-muted" onClick={() => updateSettings({ splitRatio: 50 })}>Reset split to 50/50</button>
     </div>
   </div>
 }
