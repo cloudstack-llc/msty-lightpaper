@@ -145,7 +145,7 @@ export async function activate(api: LightPaperPluginApi) {
 }
 ```
 
-When a user selects a loaded model in the AI panel, `AiActionInput` includes `input.provider` and `input.model`. Preset handlers should use those values to choose an endpoint or show which model would be used. The sample provider catalog uses `apiKeyRef` values such as `secret://providers/openai/api-key`; resolving those references to real keys belongs in the app secret layer, not plugin source code.
+When a user selects a loaded model in the AI panel, `AiActionInput` includes `input.provider` and `input.model`. Preset handlers should use those values to choose an endpoint or show which model would be used. The sample provider catalog uses `apiKeyRef` values such as `secret://providers/openai/api-key`; resolving those references to real keys belongs only in Electron AI execution, not plugin source code or renderer state. See `docs/SECRET_VAULT.md` for the vault format and no-recovery behavior.
 
 ## Metadata
 

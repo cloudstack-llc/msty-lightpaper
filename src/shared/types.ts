@@ -45,3 +45,5 @@ export type DeleteEntryInput = { workspaceId: string; path: string }
 export type SaveFileInput = { workspaceId: string; path: string; content: string }
 export type AiActionInput = { presetId?: string; prompt?: string; text: string; document?: string; path?: string; provider?: AiProviderConfig; model?: AiModelConfig }
 export type AiActionOutput = { text: string; tags?: string[]; summary?: string }
+export type VaultStatus = { exists: boolean; unlocked: boolean; secretCount: number; updatedAt?: number; version?: number; error?: string }
+export type SecretRefStatus = { apiKeyRef: string; hasSecret: boolean; updatedAt?: number; deleted?: boolean }

@@ -2,6 +2,8 @@ import { app, BrowserWindow, ipcMain, nativeTheme } from 'electron'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { LightPaperDb } from './database'
+import { SecretVault } from './secret-vault'
+import { runAiActionOffline } from './ai-service'
 import { samplePlugins } from './bundled-plugins'
 import { assertInsideWorkspace, chooseWorkspace, createEntry, deleteEntry, readFile, readTree, renameEntry, saveFile } from './fs-service'
 import type { AiActionInput, AppSettings, CreateEntryInput, DeleteEntryInput, RenameEntryInput, SaveFileInput } from '../src/shared/types'
@@ -9,6 +11,7 @@ import type { AiActionInput, AppSettings, CreateEntryInput, DeleteEntryInput, Re
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 let mainWindow: BrowserWindow | undefined
 let db: LightPaperDb
+let vault: SecretVault
 
 function createWindow() {
   mainWindow = new BrowserWindow({ width: 1480, height: 940, minWidth: 1000, minHeight: 700, titleBarStyle: 'hiddenInset', backgroundColor: '#0b0d10', webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, nodeIntegration: false } })
@@ -18,6 +21,7 @@ function createWindow() {
 
 app.whenReady().then(() => {
   db = new LightPaperDb()
+  vault = new SecretVault(path.join(app.getPath('userData'), 'lightpaper-vault.json'))
   nativeTheme.themeSource = 'dark'
   createWindow()
   app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow() })
@@ -57,11 +61,12 @@ ipcMain.handle('plugins:seed', () => {
   if (oldSampleRows.length) db.removePlugins(oldSampleRows)
   return db.listPlugins()
 })
-ipcMain.handle('ai:run', async (_event, input: AiActionInput) => {
-  const text = input.text || input.document || ''
-  const words = text.split(/\s+/).filter(Boolean)
-  if (input.presetId === 'tags') return { text: '', tags: Array.from(new Set(words.filter((w) => w.length > 5).slice(0, 8).map((w) => w.toLowerCase().replace(/[^a-z0-9-]/g, '')))) }
-  if (input.presetId === 'summary') return { text: words.slice(0, 80).join(' ') + (words.length > 80 ? '…' : '') }
-  const model = input.model ? `\n\n<!-- Selected model: ${input.provider?.name ?? input.model.providerId} / ${input.model.name} -->` : ''
-  return { text: `> AI draft placeholder\n\n${text}\n\n<!-- Configure an AI provider plugin to replace this offline stub. -->${model}` }
-})
+ipcMain.handle('vault:status', () => vault.status())
+ipcMain.handle('vault:create', (_event, masterPassword: string) => vault.createVault(masterPassword))
+ipcMain.handle('vault:unlock', (_event, masterPassword: string) => vault.unlock(masterPassword))
+ipcMain.handle('vault:lock', () => { vault.lock(); return vault.status() })
+ipcMain.handle('vault:setProviderSecret', (_event, apiKeyRef: string, secret: string) => vault.setProviderSecret(apiKeyRef, secret))
+ipcMain.handle('vault:deleteProviderSecret', (_event, apiKeyRef: string) => vault.deleteProviderSecret(apiKeyRef))
+ipcMain.handle('vault:hasProviderSecret', (_event, apiKeyRef: string) => vault.hasProviderSecret(apiKeyRef))
+ipcMain.handle('vault:listSecretRefs', () => vault.listSecretRefs())
+ipcMain.handle('ai:run', async (_event, input: AiActionInput) => runAiActionOffline(input, vault))

@@ -32,6 +32,14 @@ function bridge(overrides: Partial<Window['lightpaper']> = {}) {
     seedPlugins: vi.fn().mockResolvedValue([]),
     setPluginEnabled: vi.fn(),
     runAi: vi.fn().mockResolvedValue({ text: 'fallback' }),
+    vaultStatus: vi.fn().mockResolvedValue({ exists: false, unlocked: false, secretCount: 0 }),
+    createVault: vi.fn().mockResolvedValue({ exists: true, unlocked: true, secretCount: 0 }),
+    unlockVault: vi.fn(),
+    lockVault: vi.fn().mockResolvedValue({ exists: false, unlocked: false, secretCount: 0 }),
+    setProviderSecret: vi.fn(),
+    deleteProviderSecret: vi.fn(),
+    hasProviderSecret: vi.fn().mockResolvedValue(false),
+    listSecretRefs: vi.fn().mockResolvedValue([]),
     ...overrides,
   } as Window['lightpaper']
 }

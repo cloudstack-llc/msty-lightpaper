@@ -20,6 +20,14 @@ const api = {
   seedPlugins: () => ipcRenderer.invoke('plugins:seed'),
   setPluginEnabled: (id: string, enabled: boolean) => ipcRenderer.invoke('plugins:setEnabled', id, enabled),
   runAi: (input: AiActionInput) => ipcRenderer.invoke('ai:run', input),
+  vaultStatus: () => ipcRenderer.invoke('vault:status'),
+  createVault: (masterPassword: string) => ipcRenderer.invoke('vault:create', masterPassword),
+  unlockVault: (masterPassword: string) => ipcRenderer.invoke('vault:unlock', masterPassword),
+  lockVault: () => ipcRenderer.invoke('vault:lock'),
+  setProviderSecret: (apiKeyRef: string, secret: string) => ipcRenderer.invoke('vault:setProviderSecret', apiKeyRef, secret),
+  deleteProviderSecret: (apiKeyRef: string) => ipcRenderer.invoke('vault:deleteProviderSecret', apiKeyRef),
+  hasProviderSecret: (apiKeyRef: string) => ipcRenderer.invoke('vault:hasProviderSecret', apiKeyRef),
+  listSecretRefs: () => ipcRenderer.invoke('vault:listSecretRefs'),
 }
 
 contextBridge.exposeInMainWorld('lightpaper', api)

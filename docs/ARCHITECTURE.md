@@ -9,6 +9,7 @@ Electron main
   - workspace and file access
   - settings and plugin registry persistence
   - offline AI fallback
+  - encrypted provider secret vault and AI secret resolution
 
 Preload bridge
   - narrow `window.lightpaper` API
@@ -110,9 +111,9 @@ Registrations return disposables. The host also removes every contribution when 
 
 Model-provider plugins register selectable provider/model catalogs. The sample [Model Provider Catalog](/Users/ashokgelal/Projects/lightpaper/plugins/samples/model-provider-catalog/index.ts) includes OpenAI-style, Anthropic-style, Ollama/local, and custom OpenAI-compatible gateway profiles.
 
-Provider records include provider id, display name, base URL, docs URL, auth shape, models, endpoints, context windows, capabilities, and pricing metadata. Raw API keys are not stored in sample plugin code. The current sample uses references such as `secret://providers/openai/api-key`; a production secret resolver can map those references to OS keychain or another secure store.
+Provider records include provider id, display name, base URL, docs URL, auth shape, models, endpoints, context windows, capabilities, and pricing metadata. Raw API keys are not stored in sample plugin code. The current sample uses references such as `secret://providers/openai/api-key`. Those references are resolved only inside Electron AI execution through the encrypted local vault documented in [SECRET_VAULT.md](./SECRET_VAULT.md). Renderer code and plugins receive only status/ref metadata, never decrypted API keys.
 
-The AI panel exposes loaded models in a selector. When a model is selected, `runAiAction` enriches `AiActionInput` with the selected `provider` and `model`, so AI presets can use the chosen config.
+The AI panel exposes loaded models in a selector and shows configured/missing status for provider `apiKeyRef` values. Users can create/unlock the vault, set/update/remove provider keys, and lock the vault. There is no password recovery. When a model is selected, `runAiAction` enriches `AiActionInput` with the selected `provider` and `model`, so AI presets can use the chosen config. The Electron fallback remains offline until a real provider call is implemented, but the Electron AI service now has an internal secret resolver path for future execution.
 
 ## Markdown Pipeline
 
