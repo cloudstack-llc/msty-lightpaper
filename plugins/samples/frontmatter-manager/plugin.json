@@ -1,0 +1,17 @@
+{
+  "id": "lightpaper.frontmatter-manager",
+  "name": "Frontmatter Manager",
+  "version": "0.1.0",
+  "description": "Parse, normalize, and update YAML frontmatter for titles, tags, status, descriptions, dates, and publishing metadata.",
+  "author": "Msty LightPaper",
+  "main": "index.ts",
+  "permissions": ["commands", "metadata"],
+  "contributes": {
+    "commands": [
+      { "id": "frontmatter.insertOrNormalize", "title": "Insert or Normalize Frontmatter", "category": "Metadata" },
+      { "id": "frontmatter.touchUpdatedAt", "title": "Touch updatedAt Frontmatter", "category": "Metadata" },
+      { "id": "frontmatter.extractTitleTags", "title": "Extract Title and Tags", "category": "Metadata" }
+    ],
+    "panels": [{ "id": "frontmatter.panel", "title": "Frontmatter", "location": "right" }]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "id": "lightpaper.publishing-seo-checklist",
+  "name": "Publishing and SEO Checklist",
+  "version": "0.1.0",
+  "description": "Score documents for publishing readiness: title, description, heading hierarchy, links, image alt text, reading time, and frontmatter.",
+  "author": "Msty LightPaper",
+  "main": "index.ts",
+  "permissions": ["commands", "metadata", "ui"],
+  "contributes": {
+    "commands": [
+      { "id": "publish.auditCurrentDocument", "title": "Audit Publishing Readiness", "category": "Publishing" },
+      { "id": "publish.insertChecklist", "title": "Insert Publishing Checklist", "category": "Publishing" }
+    ],
+    "panels": [{ "id": "publish.checklist", "title": "Publishing Checklist", "location": "right" }]
+  }
+}

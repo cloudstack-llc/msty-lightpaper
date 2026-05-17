@@ -5,15 +5,15 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose(): voi
   const { settings, updateSettings } = useAppStore()
   if (!open || !settings) return null
 
-  return <div className="absolute right-4 top-16 z-20 w-[360px] overflow-hidden rounded-2xl border bg-card shadow-2xl shadow-black/40">
-    <div className="flex items-center justify-between border-b p-4">
+  return <div className="absolute bottom-4 right-4 top-16 z-20 flex w-[360px] flex-col overflow-hidden rounded-2xl border bg-card shadow-2xl shadow-black/40">
+    <div className="shrink-0 flex items-center justify-between border-b p-4">
       <div>
         <div className="flex items-center gap-2 font-semibold"><Settings className="h-4 w-4 text-primary" /> Settings</div>
         <p className="text-xs text-muted-foreground">Small knobs. Large consequences.</p>
       </div>
       <button type="button" className="rounded-md p-1 hover:bg-muted" onClick={onClose}><X className="h-4 w-4" /></button>
     </div>
-    <div className="space-y-4 p-4">
+    <div className="titlebar-no-drag min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-4">
       <label className="block space-y-2">
         <span className="flex items-center gap-2 text-sm font-medium"><Type className="h-4 w-4" /> Editor font</span>
         <select className="w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary" value={settings.fontFamily} onChange={(e) => updateSettings({ fontFamily: e.target.value as typeof settings.fontFamily })}>

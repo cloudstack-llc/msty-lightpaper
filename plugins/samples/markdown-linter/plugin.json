@@ -1,0 +1,16 @@
+{
+  "id": "lightpaper.markdown-linter",
+  "name": "Markdown Linter",
+  "version": "0.1.0",
+  "description": "Detect heading jumps, duplicate headings, long lines, missing alt text, trailing whitespace, and Markdown formatting issues.",
+  "author": "Msty LightPaper",
+  "main": "index.ts",
+  "permissions": ["commands", "ui"],
+  "contributes": {
+    "commands": [
+      { "id": "lint.currentDocument", "title": "Lint Current Markdown Document", "category": "Quality" },
+      { "id": "lint.fixWhitespace", "title": "Fix Markdown Whitespace", "category": "Quality" }
+    ],
+    "panels": [{ "id": "lint.diagnostics", "title": "Markdown Diagnostics", "location": "bottom" }]
+  }
+}

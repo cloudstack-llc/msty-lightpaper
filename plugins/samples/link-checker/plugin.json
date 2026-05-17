@@ -1,0 +1,16 @@
+{
+  "id": "lightpaper.link-checker",
+  "name": "Link Checker",
+  "version": "0.1.0",
+  "description": "Find local Markdown links, heading anchors, remote URLs, duplicate references, and likely broken link syntax.",
+  "author": "Msty LightPaper",
+  "main": "index.ts",
+  "permissions": ["commands", "filesystem", "ui"],
+  "contributes": {
+    "commands": [
+      { "id": "links.checkCurrentDocument", "title": "Check Links in Current Document", "category": "Quality" },
+      { "id": "links.listRemoteUrls", "title": "List Remote URLs", "category": "Quality" }
+    ],
+    "panels": [{ "id": "links.report", "title": "Link Report", "location": "bottom" }]
+  }
+}

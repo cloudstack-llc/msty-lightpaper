@@ -14,7 +14,11 @@ const api = {
   getSettings: () => ipcRenderer.invoke('settings:get'),
   setSettings: (settings: AppSettings) => ipcRenderer.invoke('settings:set', settings),
   listPlugins: () => ipcRenderer.invoke('plugins:list'),
+  listSamplePlugins: () => ipcRenderer.invoke('plugins:samples'),
+  installSamplePlugin: (id: string) => ipcRenderer.invoke('plugins:installSample', id),
+  uninstallPlugin: (id: string) => ipcRenderer.invoke('plugins:uninstall', id),
   seedPlugins: () => ipcRenderer.invoke('plugins:seed'),
+  setPluginEnabled: (id: string, enabled: boolean) => ipcRenderer.invoke('plugins:setEnabled', id, enabled),
   runAi: (input: AiActionInput) => ipcRenderer.invoke('ai:run', input),
 }
 

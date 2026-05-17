@@ -31,7 +31,18 @@ export class LightPaperDb {
   upsertMeta(meta: NoteMeta) { this.db.prepare('insert into note_meta(path,title,summary,tags,wordCount,updatedAt) values(@path,@title,@summary,@tags,@wordCount,@updatedAt) on conflict(path) do update set title=@title,summary=@summary,tags=@tags,wordCount=@wordCount,updatedAt=@updatedAt').run({ ...meta, tags: JSON.stringify(meta.tags) }) }
   getMeta(pathValue: string): NoteMeta | undefined { const row = this.db.prepare('select * from note_meta where path=?').get(pathValue) as any; return row ? { ...row, tags: JSON.parse(row.tags) } : undefined }
   listPlugins(): PluginRecord[] { return (this.db.prepare('select * from plugins').all() as any[]).map((row) => ({ ...JSON.parse(row.json), enabled: !!row.enabled })) }
-  upsertPlugin(plugin: PluginRecord) { this.db.prepare('insert into plugins(id,json,enabled) values(?,?,?) on conflict(id) do update set json=excluded.json,enabled=excluded.enabled').run(plugin.id, JSON.stringify(plugin), plugin.enabled ? 1 : 0) }
+  removePlugins(ids: string[]) {
+    const remove = this.db.prepare('delete from plugins where id=?')
+    const transaction = this.db.transaction((pluginIds: string[]) => pluginIds.forEach((id) => remove.run(id)))
+    transaction(ids)
+  }
+  clearPlugins() { this.db.prepare('delete from plugins').run() }
+  upsertPlugin(plugin: PluginRecord) {
+    const existing = this.db.prepare('select enabled from plugins where id=?').get(plugin.id) as { enabled: number } | undefined
+    const enabled = existing ? existing.enabled : plugin.enabled ? 1 : 0
+    this.db.prepare('insert into plugins(id,json,enabled) values(?,?,?) on conflict(id) do update set json=excluded.json').run(plugin.id, JSON.stringify({ ...plugin, enabled: !!enabled }), enabled)
+  }
+  setPluginEnabled(id: string, enabled: boolean) { this.db.prepare('update plugins set enabled=? where id=?').run(enabled ? 1 : 0, id) }
   kvGet<T>(scope: string, key: string): T | undefined { const row = this.db.prepare('select value from kv where scope=? and key=?').get(scope, key) as { value: string } | undefined; return row ? JSON.parse(row.value) : undefined }
   kvSet(scope: string, key: string, value: unknown) { this.db.prepare('insert into kv(scope,key,value) values(?,?,?) on conflict(scope,key) do update set value=excluded.value').run(scope, key, JSON.stringify(value)) }
 }

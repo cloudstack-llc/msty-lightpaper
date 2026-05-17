@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, nativeTheme } from 'electron'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { LightPaperDb } from './database'
+import { samplePlugins } from './bundled-plugins'
 import { assertInsideWorkspace, chooseWorkspace, createEntry, deleteEntry, readFile, readTree, renameEntry, saveFile } from './fs-service'
 import type { AiActionInput, AppSettings, CreateEntryInput, DeleteEntryInput, RenameEntryInput, SaveFileInput } from '../src/shared/types'
 
@@ -41,13 +42,19 @@ ipcMain.handle('entry:delete', async (_event, input: DeleteEntryInput) => { cons
 ipcMain.handle('settings:get', () => db.getSettings())
 ipcMain.handle('settings:set', (_event, settings: AppSettings) => { db.setSettings(settings); return settings })
 ipcMain.handle('plugins:list', () => db.listPlugins())
+ipcMain.handle('plugins:samples', () => samplePlugins)
+ipcMain.handle('plugins:installSample', (_event, id: string) => {
+  const sample = samplePlugins.find((plugin) => plugin.id === id)
+  if (!sample) throw new Error('Sample plugin not found')
+  db.upsertPlugin({ ...sample, enabled: false, sample: false })
+  return db.listPlugins()
+})
+ipcMain.handle('plugins:uninstall', (_event, id: string) => { db.removePlugins([id]); return db.listPlugins() })
+ipcMain.handle('plugins:setEnabled', (_event, id: string, enabled: boolean) => { db.setPluginEnabled(id, enabled); return db.listPlugins() })
 ipcMain.handle('plugins:seed', () => {
-  const plugins = [
-    { id: 'lightpaper.ai-copilot', name: 'AI Copilot Core', version: '0.1.0', description: 'Summaries, tags, rewrites, outlines, critique, and transform presets. Can be replaced by provider plugins.', permissions: ['ai','commands','metadata'] as const, enabled: true, builtin: true, contributes: { commands: [{ id: 'ai.rewrite', title: 'Rewrite Selection', category: 'AI' }, { id: 'ai.summarize', title: 'Summarize Document', category: 'AI' }], aiPresets: [] } },
-    { id: 'lightpaper.markdown-powerpack', name: 'Markdown Power Pack', version: '0.1.0', description: 'Footnotes, anchors, task lists, callouts, frontmatter, backlinks, and wiki-links.', permissions: ['markdown','metadata'] as const, enabled: true, builtin: true },
-    { id: 'lightpaper.publisher-kit', name: 'Publisher Kit', version: '0.1.0', description: 'Future export pipeline for HTML, PDF, EPUB, and static sites.', permissions: ['filesystem','commands','markdown'] as const, enabled: false, builtin: true },
-  ]
-  plugins.forEach((p) => db.upsertPlugin(p as any))
+  const sampleIds = samplePlugins.map((plugin) => plugin.id)
+  const oldSampleRows = db.listPlugins().filter((plugin) => sampleIds.includes(plugin.id) && (plugin.sample === true || plugin.builtin === true)).map((plugin) => plugin.id)
+  if (oldSampleRows.length) db.removePlugins(oldSampleRows)
   return db.listPlugins()
 })
 ipcMain.handle('ai:run', async (_event, input: AiActionInput) => {

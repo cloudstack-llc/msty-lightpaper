@@ -1,0 +1,16 @@
+{
+  "id": "lightpaper.export-pack",
+  "name": "Export Pack",
+  "version": "0.1.0",
+  "description": "Prepare Markdown for clean HTML, plain text, and static publishing exports.",
+  "author": "Msty LightPaper",
+  "main": "index.ts",
+  "permissions": ["commands", "markdown", "filesystem"],
+  "contributes": {
+    "commands": [
+      { "id": "export.copyHtml", "title": "Export Current Document as HTML", "category": "Export" },
+      { "id": "export.copyPlainText", "title": "Export Current Document as Plain Text", "category": "Export" },
+      { "id": "export.prepareStaticPage", "title": "Prepare Static HTML Page", "category": "Export" }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "lightpaper.backlinks-wikilinks",
+  "name": "Backlinks and Wiki Links",
+  "version": "0.1.0",
+  "description": "Extract [[wiki links]], outgoing links, unresolved references, and backlink-ready note aliases.",
+  "author": "Msty LightPaper",
+  "main": "index.ts",
+  "permissions": ["commands", "metadata", "markdown", "ui"],
+  "contributes": {
+    "commands": [
+      { "id": "links.extractWikiLinks", "title": "Extract Wiki Links", "category": "Knowledge Base" },
+      { "id": "links.insertWikiLink", "title": "Insert Wiki Link", "category": "Knowledge Base" }
+    ],
+    "markdownIt": ["wikilinks"],
+    "panels": [{ "id": "links.backlinks", "title": "Backlinks", "location": "right" }]
+  }
+}

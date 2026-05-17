@@ -1,0 +1,16 @@
+{
+  "id": "lightpaper.table-formatter",
+  "name": "Table Formatter",
+  "version": "0.1.0",
+  "description": "Format Markdown tables, convert CSV/TSV to tables, and normalize column alignment.",
+  "author": "Msty LightPaper",
+  "main": "index.ts",
+  "permissions": ["commands"],
+  "contributes": {
+    "commands": [
+      { "id": "table.formatSelection", "title": "Format Markdown Table", "category": "Editing" },
+      { "id": "table.csvToMarkdown", "title": "Convert CSV/TSV to Markdown Table", "category": "Editing" },
+      { "id": "table.insertStarter", "title": "Insert Starter Table", "category": "Editing" }
+    ]
+  }
+}

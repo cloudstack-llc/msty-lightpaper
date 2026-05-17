@@ -1,0 +1,18 @@
+{
+  "id": "lightpaper.snippet-template-library",
+  "name": "Snippet and Template Library",
+  "version": "0.1.0",
+  "description": "Insert reusable Markdown templates for project briefs, ADRs, bug reports, changelogs, and release notes.",
+  "author": "Msty LightPaper",
+  "main": "index.ts",
+  "permissions": ["commands", "filesystem", "ui"],
+  "contributes": {
+    "commands": [
+      { "id": "templates.insertAdr", "title": "Insert Architecture Decision Record", "category": "Templates" },
+      { "id": "templates.insertBugReport", "title": "Insert Bug Report", "category": "Templates" },
+      { "id": "templates.insertReleaseNotes", "title": "Insert Release Notes", "category": "Templates" },
+      { "id": "templates.insertProjectBrief", "title": "Insert Project Brief", "category": "Templates" }
+    ],
+    "panels": [{ "id": "templates.library", "title": "Templates", "location": "right" }]
+  }
+}

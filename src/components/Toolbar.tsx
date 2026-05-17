@@ -1,11 +1,11 @@
-import { Bot, Eye, GitBranch, PanelLeftClose, Save, Settings, SplitSquareHorizontal, Type, Wand2 } from 'lucide-react'
+import { Bot, Command, Eye, GitBranch, PanelLeftClose, Save, Settings, SplitSquareHorizontal, Type, Wand2 } from 'lucide-react'
 import type { EditorMode, ThemeId } from '@shared/types'
 import { basename, wordCount } from '@/lib/utils'
 import { useAppStore } from '@/store/app-store'
 
 const themes: ThemeId[] = ['obsidian', 'paper', 'midnight', 'solar', 'forest']
 
-export function Toolbar({ onAi, onPlugins, onSettings, onToggleSidebar, sidebarOpen }: { onAi(): void; onPlugins(): void; onSettings(): void; onToggleSidebar(): void; sidebarOpen: boolean }) {
+export function Toolbar({ onAi, onPlugins, onCommands, onSettings, onToggleSidebar, sidebarOpen }: { onAi(): void; onPlugins(): void; onCommands(): void; onSettings(): void; onToggleSidebar(): void; sidebarOpen: boolean }) {
   const { activeFile, content, savedContent, settings, save, updateSettings } = useAppStore()
   const dirty = content !== savedContent
   const setMode = (editorMode: EditorMode) => updateSettings({ editorMode, ...(editorMode === 'split' ? { splitRatio: 50 } : {}) })
@@ -28,6 +28,7 @@ export function Toolbar({ onAi, onPlugins, onSettings, onToggleSidebar, sidebarO
         <select className="bg-transparent text-foreground outline-none" value={settings?.theme ?? 'obsidian'} onChange={(e) => updateSettings({ theme: e.target.value as ThemeId })}>{themes.map((t) => <option key={t} value={t}>{t}</option>)}</select>
       </label>
       <button type="button" className="rounded-xl border bg-card px-3 py-2 text-sm hover:bg-muted" onClick={onAi}><Bot className="mr-1.5 inline h-4 w-4 text-accent" />AI</button>
+      <button type="button" className="rounded-xl border bg-card px-3 py-2 text-sm hover:bg-muted" onClick={onCommands}><Command className="mr-1.5 inline h-4 w-4 text-accent" />Commands</button>
       <button type="button" className="rounded-xl border bg-card px-3 py-2 text-sm hover:bg-muted" onClick={onPlugins}><GitBranch className="mr-1.5 inline h-4 w-4 text-primary" />Plugins</button>
       <button type="button" className="rounded-xl border bg-card px-3 py-2 text-sm hover:bg-muted" onClick={() => updateSettings({ syncScroll: !settings?.syncScroll })}><Wand2 className="mr-1.5 inline h-4 w-4" />Sync {settings?.syncScroll ? 'on' : 'off'}</button>
       <button type="button" className="rounded-xl bg-primary px-3 py-2 text-sm text-primary-foreground disabled:opacity-45" disabled={!activeFile || !dirty} onClick={save}><Save className="mr-1.5 inline h-4 w-4" />Save</button>

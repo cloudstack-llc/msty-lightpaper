@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { ensureBundledPluginsActivated, getPluginCommand, listPluginCommands, type RegisteredCommand } from '@/lib/plugin-runtime'
 import type { AppSettings, FileNode, PluginRecord, Workspace } from '@shared/types'
 
 type WorkspaceTree = { workspace: Workspace; tree: FileNode[]; loading?: boolean; error?: string }
@@ -12,6 +13,8 @@ type State = {
   savedContent: string
   settings?: AppSettings
   plugins: PluginRecord[]
+  samplePlugins: PluginRecord[]
+  pluginCommands: RegisteredCommand[]
   loading: boolean
   lastError?: string
   lastAction?: string
@@ -28,6 +31,10 @@ type State = {
   deleteEntry(path: string): Promise<void>
   updateSettings(next: Partial<AppSettings>): Promise<void>
   seedPlugins(): Promise<void>
+  executePluginCommand(commandId: string): Promise<void>
+  setPluginEnabled(id: string, enabled: boolean): Promise<void>
+  installSamplePlugin(id: string): Promise<void>
+  uninstallPlugin(id: string): Promise<void>
 }
 
 function isInside(root: string, target: string) {
@@ -106,20 +113,26 @@ export const useAppStore = create<State>((set, get) => ({
   content: '',
   savedContent: '',
   plugins: [],
+  samplePlugins: [],
+  pluginCommands: [],
   loading: false,
   setActiveFile: (path) => set({ activeFile: path }),
   setContent: (content) => set({ content }),
   hydrate: async () => {
     set({ loading: true, lastError: undefined })
-    const [workspaces, settings, plugins] = await Promise.all([
+    const [workspaces, settings, plugins, samplePlugins] = await Promise.all([
       window.lightpaper.listWorkspaces(),
       window.lightpaper.getSettings(),
       window.lightpaper.seedPlugins(),
-    ]) as [Workspace[], AppSettings, PluginRecord[]]
+      window.lightpaper.listSamplePlugins(),
+    ]) as [Workspace[], AppSettings, PluginRecord[], PluginRecord[]]
+    await ensureBundledPluginsActivated(plugins)
     set({
       workspaces,
       settings,
       plugins,
+      samplePlugins,
+      pluginCommands: listPluginCommands(),
       activeWorkspace: workspaces[0],
       workspaceTrees: workspaces.map((workspace) => ({ workspace, tree: [], loading: true })),
       loading: false,
@@ -245,5 +258,43 @@ export const useAppStore = create<State>((set, get) => ({
     await window.lightpaper.setSettings(settings)
     set({ settings })
   },
-  seedPlugins: async () => set({ plugins: await window.lightpaper.seedPlugins() }),
+  seedPlugins: async () => {
+    const [plugins, samplePlugins] = await Promise.all([window.lightpaper.seedPlugins(), window.lightpaper.listSamplePlugins()]) as [PluginRecord[], PluginRecord[]]
+    await ensureBundledPluginsActivated(plugins)
+    set({ plugins, samplePlugins, pluginCommands: listPluginCommands() })
+  },
+  setPluginEnabled: async (id, enabled) => {
+    const plugins = await window.lightpaper.setPluginEnabled(id, enabled) as PluginRecord[]
+    await ensureBundledPluginsActivated(plugins)
+    set({ plugins, pluginCommands: listPluginCommands(), lastAction: `${enabled ? 'Enabled' : 'Disabled'} ${plugins.find((plugin) => plugin.id === id)?.name ?? id}`, lastError: undefined })
+  },
+  installSamplePlugin: async (id) => {
+    const plugins = await window.lightpaper.installSamplePlugin(id) as PluginRecord[]
+    await ensureBundledPluginsActivated(plugins)
+    set({ plugins, pluginCommands: listPluginCommands(), lastAction: `Installed ${plugins.find((plugin) => plugin.id === id)?.name ?? id}`, lastError: undefined })
+  },
+  uninstallPlugin: async (id) => {
+    const target = get().plugins.find((plugin) => plugin.id === id)
+    const plugins = await window.lightpaper.uninstallPlugin(id) as PluginRecord[]
+    await ensureBundledPluginsActivated(plugins)
+    set({ plugins, pluginCommands: listPluginCommands(), lastAction: `Uninstalled ${target?.name ?? id}`, lastError: undefined })
+  },
+  executePluginCommand: async (commandId) => {
+    const command = getPluginCommand(commandId)
+    if (!command) return set({ lastError: `Plugin command not found: ${commandId}` })
+    const snapshot = get()
+    try {
+      await command.handler({
+        activeFile: snapshot.activeFile,
+        selectedText: '',
+        documentText: snapshot.content,
+        replaceSelection: async (text) => set({ content: text }),
+        insertText: async (text) => set({ content: `${get().content}${text}` }),
+        showToast: (message) => set({ lastAction: message, lastError: undefined }),
+      })
+      set({ lastAction: `Ran ${command.title}`, lastError: undefined })
+    } catch (error) {
+      set({ lastError: `Command failed: ${errorMessage(error)}` })
+    }
+  },
 }))

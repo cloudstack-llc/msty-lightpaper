@@ -1,0 +1,21 @@
+{
+  "id": "lightpaper.ai-rewrite-toolkit",
+  "name": "AI Rewrite Toolkit",
+  "version": "0.1.0",
+  "description": "Document-aware AI presets for clarity, concision, outlines, summaries, titles, and section rewrites.",
+  "author": "Msty LightPaper",
+  "main": "index.ts",
+  "permissions": ["ai", "commands"],
+  "contributes": {
+    "commands": [
+      { "id": "aiRewrite.clarify", "title": "AI: Improve Clarity", "category": "AI" },
+      { "id": "aiRewrite.makeConcise", "title": "AI: Make Concise", "category": "AI" },
+      { "id": "aiRewrite.titleOptions", "title": "AI: Generate Title Options", "category": "AI" }
+    ],
+    "aiPresets": [
+      { "id": "clarify", "label": "Improve clarity", "prompt": "Rewrite this text for clarity while preserving meaning.", "scope": "selection" },
+      { "id": "concise", "label": "Make concise", "prompt": "Make this text concise without losing important detail.", "scope": "selection" },
+      { "id": "titles", "label": "Generate titles", "prompt": "Generate 8 strong title options for this document.", "scope": "document" }
+    ]
+  }
+}
