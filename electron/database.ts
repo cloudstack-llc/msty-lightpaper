@@ -25,6 +25,7 @@ export class LightPaperDb {
   }
   listWorkspaces(): Workspace[] { return this.db.prepare('select * from workspaces order by lastOpenedAt desc').all() as Workspace[] }
   upsertWorkspace(workspace: Workspace) { this.db.prepare('insert into workspaces(id,name,path,createdAt,lastOpenedAt) values(@id,@name,@path,@createdAt,@lastOpenedAt) on conflict(path) do update set name=@name,lastOpenedAt=@lastOpenedAt').run(workspace) }
+  removeWorkspace(id: string) { this.db.prepare('delete from workspaces where id=?').run(id) }
   getSettings(): AppSettings { return { ...defaults, ...JSON.parse((this.db.prepare('select value from settings where key=?').get('app') as { value: string } | undefined)?.value ?? '{}') } }
   setSettings(settings: AppSettings) { this.db.prepare('insert into settings(key,value) values(?,?) on conflict(key) do update set value=excluded.value').run('app', JSON.stringify(settings)) }
   upsertMeta(meta: NoteMeta) { this.db.prepare('insert into note_meta(path,title,summary,tags,wordCount,updatedAt) values(@path,@title,@summary,@tags,@wordCount,@updatedAt) on conflict(path) do update set title=@title,summary=@summary,tags=@tags,wordCount=@wordCount,updatedAt=@updatedAt').run({ ...meta, tags: JSON.stringify(meta.tags) }) }

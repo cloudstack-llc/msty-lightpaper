@@ -5,6 +5,7 @@ const api = {
   listWorkspaces: () => ipcRenderer.invoke('workspace:list'),
   addWorkspace: () => ipcRenderer.invoke('workspace:add'),
   readTree: (id: string) => ipcRenderer.invoke('workspace:tree', id),
+  removeWorkspace: (id: string) => ipcRenderer.invoke('workspace:remove', id),
   readFile: (workspaceId: string, path: string) => ipcRenderer.invoke('file:read', workspaceId, path),
   saveFile: (input: SaveFileInput) => ipcRenderer.invoke('file:save', input),
   createEntry: (input: CreateEntryInput) => ipcRenderer.invoke('entry:create', input),

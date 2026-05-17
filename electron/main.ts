@@ -32,6 +32,7 @@ function workspacePath(id: string) {
 ipcMain.handle('workspace:list', () => db.listWorkspaces())
 ipcMain.handle('workspace:add', async () => { const ws = await chooseWorkspace(); if (ws) db.upsertWorkspace(ws); return ws })
 ipcMain.handle('workspace:tree', async (_event, id: string) => readTree(workspacePath(id)))
+ipcMain.handle('workspace:remove', async (_event, id: string) => { db.removeWorkspace(id); return db.listWorkspaces() })
 ipcMain.handle('file:read', async (_event, workspaceId: string, filePath: string) => { const root = workspacePath(workspaceId); assertInsideWorkspace(root, filePath); return readFile(filePath) })
 ipcMain.handle('file:save', async (_event, input: SaveFileInput) => { const root = workspacePath(input.workspaceId); assertInsideWorkspace(root, input.path); await saveFile(input.path, input.content); return true })
 ipcMain.handle('entry:create', async (_event, input: CreateEntryInput) => { const root = workspacePath(input.workspaceId); assertInsideWorkspace(root, input.parentPath); await createEntry(input); return true })
