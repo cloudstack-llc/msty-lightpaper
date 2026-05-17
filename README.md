@@ -27,4 +27,4 @@ npm test
 - Plugins register explicit contributions through a testable `PluginHost`.
 - Plugin permissions are validated before activation and enforced during registration.
 - Sample plugins are ordinary TypeScript modules with contract tests.
-- AI features are exposed through plugin presets, with an offline Electron fallback for development.
+- AI features are exposed through plugin presets and selectable model-provider configs, with an offline Electron fallback for development.

@@ -1,5 +1,6 @@
-import type { AiActionInput, AiActionOutput, PluginPermission, PluginRecord } from '@shared/types'
+import type { AiActionInput, AiActionOutput, AiProviderConfig, PluginPermission, PluginRecord } from '@shared/types'
 import type {
+  LightPaperAiProviderRegistration,
   LightPaperAiPresetRegistration,
   LightPaperCommandContext,
   LightPaperCommandRegistration,
@@ -77,6 +78,7 @@ export class PluginHost {
   private records = new Map<string, PluginRecord>()
   private commands: LightPaperCommandRegistration[] = []
   private aiPresets: LightPaperAiPresetRegistration[] = []
+  private aiProviders: LightPaperAiProviderRegistration[] = []
   private markdownExtensions: LightPaperMarkdownExtension[] = []
   private panels: LightPaperPanelRegistration[] = []
   private activationErrors: PluginActivationError[] = []
@@ -113,6 +115,7 @@ export class PluginHost {
     this.activePluginIds.clear()
     this.commands = []
     this.aiPresets = []
+    this.aiProviders = []
     this.markdownExtensions = []
     this.panels = []
 
@@ -141,6 +144,26 @@ export class PluginHost {
 
   getAiPreset(id: string) {
     return this.aiPresets.find((preset) => preset.id === id)
+  }
+
+  listAiProviders() {
+    return [...this.aiProviders].sort((a, b) => a.name.localeCompare(b.name))
+  }
+
+  listAiModels() {
+    return this.listAiProviders().flatMap((provider) => provider.models.map((model) => ({ ...model, providerId: provider.id })))
+  }
+
+  getAiProvider(id: string) {
+    return this.aiProviders.find((provider) => provider.id === id)
+  }
+
+  getAiModel(modelId: string) {
+    for (const provider of this.aiProviders) {
+      const model = provider.models.find((candidate) => candidate.id === modelId)
+      if (model) return { provider, model: { ...model, providerId: provider.id } }
+    }
+    return undefined
   }
 
   async runAiPreset(id: string, input: AiActionInput): Promise<AiActionOutput> {
@@ -214,6 +237,14 @@ export class PluginHost {
             this.aiPresets = this.aiPresets.filter((preset) => preset !== registration)
           })
         }),
+        registerProvider: (provider) => this.withPermission(plugin, 'ai', () => {
+          this.ensureUnique(this.aiProviders, provider.id, 'AI provider')
+          const normalized = this.normalizeAiProvider(plugin, provider)
+          this.aiProviders.push(normalized)
+          return this.disposable(() => {
+            this.aiProviders = this.aiProviders.filter((item) => item !== normalized)
+          })
+        }),
       },
       metadata: {
         get: <T = unknown>(path: string, key: string) => this.withPermission(plugin, 'metadata', () => this.metadataStore.get<T>(plugin.id, path, key)),
@@ -271,6 +302,7 @@ export class PluginHost {
   private removePluginContributions(pluginId: string) {
     this.commands = this.commands.filter((command) => command.pluginId !== pluginId)
     this.aiPresets = this.aiPresets.filter((preset) => preset.pluginId !== pluginId)
+    this.aiProviders = this.aiProviders.filter((provider) => provider.pluginId !== pluginId)
     this.markdownExtensions = this.markdownExtensions.filter((extension) => extension.pluginId !== pluginId)
     this.panels = this.panels.filter((panel) => panel.pluginId !== pluginId)
     this.activePluginIds.delete(pluginId)
@@ -280,5 +312,14 @@ export class PluginHost {
     this.activationErrors.push(error)
     this.onError?.(error)
     return noopDisposable()
+  }
+
+  private normalizeAiProvider(plugin: PluginRecord, provider: AiProviderConfig): LightPaperAiProviderRegistration {
+    return {
+      ...provider,
+      pluginId: plugin.id,
+      pluginName: plugin.name,
+      models: provider.models.map((model) => ({ ...model, providerId: provider.id })),
+    }
   }
 }

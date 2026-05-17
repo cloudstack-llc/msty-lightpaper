@@ -4,12 +4,16 @@ import { bundledPluginModules } from '../../src/lib/bundled-plugin-modules'
 import { PluginHost } from '../../src/lib/plugin-host'
 import { validatePluginManifest } from '../../src/lib/plugin-manifest'
 import { offlineRewrite } from './ai-rewrite-toolkit'
+import { critique, rewrite, runCopilotPreset } from './ai-copilot-core'
 import { extractWikiLinks, remarkWikiLinks } from './backlinks-wikilinks'
 import { todayTemplate, weeklyTemplate } from './daily-notes'
 import { markdownToPlainText, markdownToSimpleHtml, staticPage } from './export-pack'
 import { parseFrontmatter, stringifyFrontmatter } from './frontmatter-manager'
 import { checkLinks, extractLinks } from './link-checker'
+import { markdownPowerReport, normalizeMarkdownPowerPack } from './markdown-power-pack'
 import { fixWhitespace, formatIssues, lintMarkdown } from './markdown-linter'
+import { formatModelCatalog, providerCatalog } from './model-provider-catalog'
+import { publishingBrief, staticHtmlExportBlock } from './publisher-kit'
 import { auditPublishingReadiness, checklistMarkdown } from './publishing-seo-checklist'
 import { delimitedToMarkdownTable, formatMarkdownTable } from './table-formatter'
 
@@ -26,9 +30,10 @@ describe('sample plugin catalog', () => {
     await host.activatePlugins(samplePlugins.map((plugin) => ({ ...plugin, enabled: true, sample: false })))
 
     expect(host.errors).toEqual([])
-    expect(host.listCommands().length).toBeGreaterThan(20)
-    expect(host.listAiPresets().map((preset) => preset.id)).toEqual(expect.arrayContaining(['clarify', 'concise', 'titles']))
-    expect(host.listMarkdownExtensions().map((extension) => extension.id)).toContain('wikilinks')
+    expect(host.listCommands().length).toBeGreaterThan(35)
+    expect(host.listAiPresets().map((preset) => preset.id)).toEqual(expect.arrayContaining(['clarify', 'concise', 'titles', 'copilot.summary', 'copilot.critique']))
+    expect(host.listMarkdownExtensions().map((extension) => extension.id)).toEqual(expect.arrayContaining(['wikilinks', 'powerpack.wikilinks']))
+    expect(host.listAiProviders().map((provider) => provider.id)).toEqual(expect.arrayContaining(['openai.responses', 'ollama.local', 'custom.openai-compatible']))
   })
 })
 
@@ -36,6 +41,14 @@ describe('sample plugin pure helpers', () => {
   it('rewrites AI text offline for deterministic tests', () => {
     expect(offlineRewrite({ text: 'We utilize this in order to be very clear.' }, 'clarify').text).toBe('We use this to be clear.')
     expect(offlineRewrite({ text: '# LightPaper\n\nBody text' }, 'titles').text).toContain('LightPaper')
+  })
+
+  it('runs copilot workflows with selected model context', () => {
+    const input = { text: 'We utilize headings in order to clarify.', model: providerCatalog[0].models[0], provider: providerCatalog[0] }
+
+    expect(rewrite(input).text).toContain('OpenAI Responses API / GPT-5.4')
+    expect(critique({ text: '# Title\n\nBody' }).text).toContain('Uses section headings')
+    expect(runCopilotPreset('copilot.outline', { text: '# A\n\n## B' }).text).toContain('- A')
   })
 
   it('extracts wiki links and exposes a remark plugin', () => {
@@ -79,6 +92,25 @@ describe('sample plugin pure helpers', () => {
 
     expect(audit.score).toBeGreaterThan(40)
     expect(checklistMarkdown('# Title')).toContain('Publishing checklist')
+  })
+
+  it('combines Markdown power-pack helpers', () => {
+    expect(markdownPowerReport('---\ntitle: Test\n---\n\n# Test\n\n[[Note]]')).toContain('Wiki links: 1')
+    const normalized = normalizeMarkdownPowerPack('---\ntitle: Test\n---\n\n# Test  \n\n\n\nBody')
+    expect(normalized).toContain('title: "Test"')
+    expect(normalized).toContain('# Test')
+    expect(normalized).not.toContain('# Test  ')
+  })
+
+  it('describes model providers without raw API keys', () => {
+    expect(providerCatalog[0].auth.apiKeyRef).toBe('secret://providers/openai/api-key')
+    expect(formatModelCatalog()).toContain('OpenAI Responses API')
+    expect(formatModelCatalog()).not.toContain('sk-')
+  })
+
+  it('builds publisher-kit outputs', () => {
+    expect(publishingBrief('# Title\n\n## Section')).toContain('Publisher Kit Brief')
+    expect(staticHtmlExportBlock('# Title')).toContain('```html')
   })
 
   it('formats Markdown tables and delimited text', () => {

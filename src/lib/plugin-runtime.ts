@@ -25,6 +25,18 @@ export function listPluginAiPresets() {
   return bundledPluginHost.listAiPresets()
 }
 
+export function listPluginAiProviders() {
+  return bundledPluginHost.listAiProviders()
+}
+
+export function listPluginAiModels() {
+  return bundledPluginHost.listAiModels()
+}
+
+export function getPluginAiModel(modelId: string) {
+  return bundledPluginHost.getAiModel(modelId)
+}
+
 export function getPluginAiPreset(id: string) {
   return bundledPluginHost.getAiPreset(id)
 }
@@ -51,3 +63,4 @@ export function listPluginActivationErrors() {
 
 export type RegisteredCommand = ReturnType<typeof listPluginCommands>[number]
 export type RegisteredAiPreset = ReturnType<typeof listPluginAiPresets>[number]
+export type RegisteredAiProvider = ReturnType<typeof listPluginAiProviders>[number]

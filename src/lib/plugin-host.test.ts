@@ -128,6 +128,34 @@ describe('PluginHost', () => {
     expect(host.listMarkdownExtensions('remark')).toHaveLength(1)
     expect(host.listMarkdownExtensions('rehype')).toHaveLength(1)
   })
+
+  it('registers AI provider model catalogs as selectable runtime data', async () => {
+    const module: LightPaperPluginModule = {
+      activate(api) {
+        api.ai.registerProvider({
+          id: 'test.provider',
+          name: 'Test Provider',
+          baseUrl: 'https://models.example.test/v1',
+          auth: { type: 'bearer', apiKeyRef: 'secret://providers/test/api-key' },
+          models: [{
+            id: 'test-model',
+            providerId: 'test.provider',
+            name: 'Test Model',
+            family: 'test',
+            contextWindow: 128000,
+            capabilities: ['chat', 'markdown'],
+            pricing: { inputPerMillion: 1, outputPerMillion: 2, currency: 'USD' },
+          }],
+        })
+      },
+    }
+    const host = new PluginHost({ modules: { 'test.plugin': module } })
+
+    await host.activatePlugins([plugin({ permissions: ['ai'], contributes: { aiProviders: [{ id: 'test.provider', title: 'Test Provider', models: ['test-model'] }] } })])
+
+    expect(host.listAiProviders()).toHaveLength(1)
+    expect(host.getAiModel('test-model')?.provider.name).toBe('Test Provider')
+  })
 })
 
 describe('validatePluginManifest', () => {

@@ -1,0 +1,31 @@
+{
+  "id": "lightpaper.ai-copilot",
+  "name": "AI Copilot Core",
+  "version": "0.1.0",
+  "description": "First-party AI writing workflows for summaries, tags, rewrites, outlines, critique, and continuation.",
+  "author": "Msty LightPaper",
+  "main": "index.ts",
+  "permissions": ["ai", "commands"],
+  "contributes": {
+    "commands": [
+      { "id": "copilot.summarizeDocument", "title": "Copilot: Summarize Document", "category": "AI" },
+      { "id": "copilot.generateTags", "title": "Copilot: Generate Tags", "category": "AI" },
+      { "id": "copilot.rewriteSelection", "title": "Copilot: Rewrite Selection", "category": "AI" },
+      { "id": "copilot.outlineDocument", "title": "Copilot: Outline Document", "category": "AI" },
+      { "id": "copilot.critiqueDraft", "title": "Copilot: Critique Draft", "category": "AI" },
+      { "id": "copilot.continueDraft", "title": "Copilot: Continue Draft", "category": "AI" }
+    ],
+    "aiPresets": [
+      { "id": "copilot.summary", "label": "Copilot: Summarize", "prompt": "Summarize the current note.", "scope": "document" },
+      { "id": "copilot.tags", "label": "Copilot: Generate tags", "prompt": "Generate useful tags.", "scope": "document" },
+      { "id": "copilot.rewrite", "label": "Copilot: Rewrite sharper", "prompt": "Rewrite for clarity.", "scope": "selection" },
+      { "id": "copilot.outline", "label": "Copilot: Outline", "prompt": "Outline the document.", "scope": "document" },
+      { "id": "copilot.critique", "label": "Copilot: Critique draft", "prompt": "Critique the draft.", "scope": "document" },
+      { "id": "copilot.continue", "label": "Copilot: Continue draft", "prompt": "Continue the draft.", "scope": "document" }
+    ]
+  },
+  "enabled": false,
+  "builtin": false,
+  "sample": true,
+  "installedPath": "plugins/samples/ai-copilot-core"
+}

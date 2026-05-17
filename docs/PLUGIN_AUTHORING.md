@@ -116,6 +116,37 @@ export async function activate(api: LightPaperPluginApi) {
 
 The app routes plugin presets before using the Electron fallback.
 
+## Model Providers
+
+Provider plugins register model configs that AI workflows can select. Store secret references, not raw API keys.
+
+```ts
+export async function activate(api: LightPaperPluginApi) {
+  api.ai.registerProvider({
+    id: 'myProvider.openaiCompatible',
+    name: 'My OpenAI-compatible Gateway',
+    baseUrl: 'https://gateway.example.com/v1',
+    auth: {
+      type: 'bearer',
+      apiKeyRef: 'secret://providers/my-provider/api-key',
+      envVar: 'MY_PROVIDER_API_KEY'
+    },
+    models: [{
+      id: 'my-provider-default',
+      providerId: 'myProvider.openaiCompatible',
+      name: 'Default Gateway Model',
+      family: 'custom',
+      endpoint: '/responses',
+      contextWindow: 128000,
+      capabilities: ['chat', 'markdown', 'json', 'streaming'],
+      pricing: { inputPerMillion: 1, outputPerMillion: 3, currency: 'USD' }
+    }]
+  })
+}
+```
+
+When a user selects a loaded model in the AI panel, `AiActionInput` includes `input.provider` and `input.model`. Preset handlers should use those values to choose an endpoint or show which model would be used. The sample provider catalog uses `apiKeyRef` values such as `secret://providers/openai/api-key`; resolving those references to real keys belongs in the app secret layer, not plugin source code.
+
 ## Metadata
 
 Metadata is namespaced by plugin id. Two plugins can use the same document path and key without overwriting each other.
@@ -149,6 +180,7 @@ Every plugin should have:
 - Activation test through `PluginHost`.
 - Pure helper tests for transforms, audits, or templates.
 - Markdown rendering test if it registers remark or rehype extensions.
+- Model-provider registration test if it registers providers.
 - Command test using fake `insertText`, `replaceSelection`, and `showToast` functions.
 
 Example:

@@ -1,4 +1,4 @@
-import type { AiActionInput, AiActionOutput, PluginManifest } from './types'
+import type { AiActionInput, AiActionOutput, AiProviderConfig, PluginManifest } from './types'
 
 export type LightPaperDisposable = { dispose(): void }
 export type LightPaperDisposableLike = LightPaperDisposable | (() => void)
@@ -30,6 +30,11 @@ export type LightPaperAiPresetRegistration = {
   pluginId: string
   pluginName: string
   handler: (input: AiActionInput) => Promise<AiActionOutput>
+}
+
+export type LightPaperAiProviderRegistration = AiProviderConfig & {
+  pluginId: string
+  pluginName: string
 }
 
 export type LightPaperMarkdownExtensionKind = 'remark' | 'rehype'
@@ -66,6 +71,7 @@ export type LightPaperPluginApi = {
   }
   ai: {
     registerPreset(id: string, label: string, handler: (input: AiActionInput) => Promise<AiActionOutput>): LightPaperDisposable
+    registerProvider(provider: AiProviderConfig): LightPaperDisposable
   }
   metadata: {
     set(path: string, key: string, value: unknown): Promise<void>

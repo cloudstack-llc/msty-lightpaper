@@ -7,8 +7,9 @@ function ContributionSummary({ plugin }: { plugin: PluginRecord }) {
   const commands = plugin.contributes?.commands ?? []
   const panels = plugin.contributes?.panels ?? []
   const aiPresets = plugin.contributes?.aiPresets ?? []
+  const aiProviders = plugin.contributes?.aiProviders ?? []
 
-  if (!commands.length && !panels.length && !aiPresets.length) return null
+  if (!commands.length && !panels.length && !aiPresets.length && !aiProviders.length) return null
 
   return (
     <div className="mt-3 grid gap-2 text-xs md:grid-cols-3">
@@ -37,6 +38,14 @@ function ContributionSummary({ plugin }: { plugin: PluginRecord }) {
           </ul>
         </div>
       )}
+      {aiProviders.length > 0 && (
+        <div className="rounded-lg border bg-card/60 p-2">
+          <div className="mb-1 font-medium text-foreground">Model Providers</div>
+          <ul className="space-y-1 text-muted-foreground">
+            {aiProviders.map((provider) => <li key={provider.id}>• {provider.title} ({provider.models?.length ?? 0})</li>)}
+          </ul>
+        </div>
+      )}
     </div>
   )
 }
@@ -51,6 +60,7 @@ export function PluginPanel({ open, onClose }: { open: boolean; onClose(): void 
       enabled: enabledPlugins.length,
       commands: enabledPlugins.reduce((count, plugin) => count + (plugin.contributes?.commands?.length ?? 0), 0),
       aiPresets: enabledPlugins.reduce((count, plugin) => count + (plugin.contributes?.aiPresets?.length ?? 0), 0),
+      aiProviders: enabledPlugins.reduce((count, plugin) => count + (plugin.contributes?.aiProviders?.length ?? 0), 0),
     }
   }, [plugins])
 
@@ -71,7 +81,7 @@ export function PluginPanel({ open, onClose }: { open: boolean; onClose(): void 
           <div className="rounded-xl border bg-background p-3"><Boxes className="mb-2 h-4 w-4 text-primary" /><div className="text-lg font-semibold">{plugins.length}</div><p className="text-xs text-muted-foreground">installed</p></div>
           <div className="rounded-xl border bg-background p-3"><CheckCircle2 className="mb-2 h-4 w-4 text-emerald-400" /><div className="text-lg font-semibold">{stats.enabled}</div><p className="text-xs text-muted-foreground">enabled</p></div>
           <div className="rounded-xl border bg-background p-3"><TerminalSquare className="mb-2 h-4 w-4 text-accent" /><div className="text-lg font-semibold">{stats.commands}</div><p className="text-xs text-muted-foreground">active commands</p></div>
-          <div className="rounded-xl border bg-background p-3"><Cpu className="mb-2 h-4 w-4 text-violet-400" /><div className="text-lg font-semibold">{stats.aiPresets}</div><p className="text-xs text-muted-foreground">active AI presets</p></div>
+          <div className="rounded-xl border bg-background p-3"><Cpu className="mb-2 h-4 w-4 text-violet-400" /><div className="text-lg font-semibold">{stats.aiPresets}/{stats.aiProviders}</div><p className="text-xs text-muted-foreground">AI presets/providers</p></div>
         </div>
 
         <section className="space-y-2">

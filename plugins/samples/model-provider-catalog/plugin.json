@@ -1,0 +1,44 @@
+{
+  "id": "lightpaper.model-provider-catalog",
+  "name": "Model Provider Catalog",
+  "version": "0.1.0",
+  "description": "Registers selectable model/provider configs with endpoints, capabilities, pricing metadata, and secret references for API keys.",
+  "author": "Msty LightPaper",
+  "main": "index.ts",
+  "permissions": ["ai", "commands"],
+  "contributes": {
+    "commands": [
+      {
+        "id": "modelProvider.insertCatalog",
+        "title": "Insert Model Provider Catalog",
+        "category": "AI"
+      }
+    ],
+    "aiProviders": [
+      {
+        "id": "openai.responses",
+        "title": "OpenAI Responses API",
+        "models": ["gpt-5.4", "gpt-5.4-mini"]
+      },
+      {
+        "id": "anthropic.messages",
+        "title": "Anthropic Messages API",
+        "models": ["claude-sonnet", "claude-haiku"]
+      },
+      {
+        "id": "ollama.local",
+        "title": "Ollama Local",
+        "models": ["llama-local"]
+      },
+      {
+        "id": "custom.openai-compatible",
+        "title": "Custom OpenAI-compatible Gateway",
+        "models": ["gateway-default"]
+      }
+    ]
+  },
+  "enabled": false,
+  "builtin": false,
+  "sample": true,
+  "installedPath": "plugins/samples/model-provider-catalog"
+}

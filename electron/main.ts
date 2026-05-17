@@ -62,5 +62,6 @@ ipcMain.handle('ai:run', async (_event, input: AiActionInput) => {
   const words = text.split(/\s+/).filter(Boolean)
   if (input.presetId === 'tags') return { text: '', tags: Array.from(new Set(words.filter((w) => w.length > 5).slice(0, 8).map((w) => w.toLowerCase().replace(/[^a-z0-9-]/g, '')))) }
   if (input.presetId === 'summary') return { text: words.slice(0, 80).join(' ') + (words.length > 80 ? '…' : '') }
-  return { text: `> AI draft placeholder\n\n${text}\n\n<!-- Configure an AI provider plugin to replace this offline stub. -->` }
+  const model = input.model ? `\n\n<!-- Selected model: ${input.provider?.name ?? input.model.providerId} / ${input.model.name} -->` : ''
+  return { text: `> AI draft placeholder\n\n${text}\n\n<!-- Configure an AI provider plugin to replace this offline stub. -->${model}` }
 })

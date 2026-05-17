@@ -411,5 +411,105 @@ export const samplePlugins: SamplePluginRecord[] = [
     "builtin": false,
     "sample": true,
     "installedPath": "plugins/samples/table-formatter"
+  },
+  {
+    "id": "lightpaper.ai-copilot",
+    "name": "AI Copilot Core",
+    "version": "0.1.0",
+    "description": "First-party AI writing workflows for summaries, tags, rewrites, outlines, critique, and continuation.",
+    "author": "Msty LightPaper",
+    "main": "index.ts",
+    "permissions": ["ai", "commands"],
+    "contributes": {
+      "commands": [
+        { "id": "copilot.summarizeDocument", "title": "Copilot: Summarize Document", "category": "AI" },
+        { "id": "copilot.generateTags", "title": "Copilot: Generate Tags", "category": "AI" },
+        { "id": "copilot.rewriteSelection", "title": "Copilot: Rewrite Selection", "category": "AI" },
+        { "id": "copilot.outlineDocument", "title": "Copilot: Outline Document", "category": "AI" },
+        { "id": "copilot.critiqueDraft", "title": "Copilot: Critique Draft", "category": "AI" },
+        { "id": "copilot.continueDraft", "title": "Copilot: Continue Draft", "category": "AI" }
+      ],
+      "aiPresets": [
+        { "id": "copilot.summary", "label": "Copilot: Summarize", "prompt": "Summarize the current note.", "scope": "document" },
+        { "id": "copilot.tags", "label": "Copilot: Generate tags", "prompt": "Generate useful tags.", "scope": "document" },
+        { "id": "copilot.rewrite", "label": "Copilot: Rewrite sharper", "prompt": "Rewrite for clarity.", "scope": "selection" },
+        { "id": "copilot.outline", "label": "Copilot: Outline", "prompt": "Outline the document.", "scope": "document" },
+        { "id": "copilot.critique", "label": "Copilot: Critique draft", "prompt": "Critique the draft.", "scope": "document" },
+        { "id": "copilot.continue", "label": "Copilot: Continue draft", "prompt": "Continue the draft.", "scope": "document" }
+      ]
+    },
+    "enabled": false,
+    "builtin": false,
+    "sample": true,
+    "installedPath": "plugins/samples/ai-copilot-core"
+  },
+  {
+    "id": "lightpaper.markdown-powerpack",
+    "name": "Markdown Power Pack",
+    "version": "0.1.0",
+    "description": "Curated Markdown power tools: wiki-link rendering, callouts, lint reports, frontmatter-safe normalization, and table formatting.",
+    "author": "Msty LightPaper",
+    "main": "index.ts",
+    "permissions": ["commands", "markdown", "metadata"],
+    "contributes": {
+      "commands": [
+        { "id": "powerpack.insertCallout", "title": "Power Pack: Insert Callout", "category": "Markdown" },
+        { "id": "powerpack.auditMarkdown", "title": "Power Pack: Audit Markdown", "category": "Markdown" },
+        { "id": "powerpack.normalizeMarkdown", "title": "Power Pack: Normalize Markdown", "category": "Markdown" },
+        { "id": "powerpack.formatTable", "title": "Power Pack: Format Table", "category": "Markdown" }
+      ],
+      "markdown": [
+        { "id": "powerpack.wikilinks", "kind": "remark", "description": "Converts [[wiki links]] into preview links." }
+      ]
+    },
+    "enabled": false,
+    "builtin": false,
+    "sample": true,
+    "installedPath": "plugins/samples/markdown-power-pack"
+  },
+  {
+    "id": "lightpaper.publisher-kit",
+    "name": "Publisher Kit",
+    "version": "0.1.0",
+    "description": "Publishing workflow tools for readiness audits, checklists, static HTML preparation, and plain-text exports.",
+    "author": "Msty LightPaper",
+    "main": "index.ts",
+    "permissions": ["commands", "filesystem", "markdown", "metadata"],
+    "contributes": {
+      "commands": [
+        { "id": "publisher.auditDocument", "title": "Publisher Kit: Audit Document", "category": "Publishing" },
+        { "id": "publisher.insertChecklist", "title": "Publisher Kit: Insert Checklist", "category": "Publishing" },
+        { "id": "publisher.prepareStaticHtml", "title": "Publisher Kit: Prepare Static HTML", "category": "Publishing" },
+        { "id": "publisher.appendPlainText", "title": "Publisher Kit: Append Plain Text Export", "category": "Publishing" }
+      ]
+    },
+    "enabled": false,
+    "builtin": false,
+    "sample": true,
+    "installedPath": "plugins/samples/publisher-kit"
+  },
+  {
+    "id": "lightpaper.model-provider-catalog",
+    "name": "Model Provider Catalog",
+    "version": "0.1.0",
+    "description": "Registers selectable model/provider configs with endpoints, capabilities, pricing metadata, and secret references for API keys.",
+    "author": "Msty LightPaper",
+    "main": "index.ts",
+    "permissions": ["ai", "commands"],
+    "contributes": {
+      "commands": [
+        { "id": "modelProvider.insertCatalog", "title": "Insert Model Provider Catalog", "category": "AI" }
+      ],
+      "aiProviders": [
+        { "id": "openai.responses", "title": "OpenAI Responses API", "models": ["gpt-5.4", "gpt-5.4-mini"] },
+        { "id": "anthropic.messages", "title": "Anthropic Messages API", "models": ["claude-sonnet", "claude-haiku"] },
+        { "id": "ollama.local", "title": "Ollama Local", "models": ["llama-local"] },
+        { "id": "custom.openai-compatible", "title": "Custom OpenAI-compatible Gateway", "models": ["gateway-default"] }
+      ]
+    },
+    "enabled": false,
+    "builtin": false,
+    "sample": true,
+    "installedPath": "plugins/samples/model-provider-catalog"
   }
 ]

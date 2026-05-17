@@ -1,0 +1,21 @@
+{
+  "id": "lightpaper.publisher-kit",
+  "name": "Publisher Kit",
+  "version": "0.1.0",
+  "description": "Publishing workflow tools for readiness audits, checklists, static HTML preparation, and plain-text exports.",
+  "author": "Msty LightPaper",
+  "main": "index.ts",
+  "permissions": ["commands", "filesystem", "markdown", "metadata"],
+  "contributes": {
+    "commands": [
+      { "id": "publisher.auditDocument", "title": "Publisher Kit: Audit Document", "category": "Publishing" },
+      { "id": "publisher.insertChecklist", "title": "Publisher Kit: Insert Checklist", "category": "Publishing" },
+      { "id": "publisher.prepareStaticHtml", "title": "Publisher Kit: Prepare Static HTML", "category": "Publishing" },
+      { "id": "publisher.appendPlainText", "title": "Publisher Kit: Append Plain Text Export", "category": "Publishing" }
+    ]
+  },
+  "enabled": false,
+  "builtin": false,
+  "sample": true,
+  "installedPath": "plugins/samples/publisher-kit"
+}

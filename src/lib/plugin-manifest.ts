@@ -47,6 +47,9 @@ export function validatePluginManifest(manifest: PluginManifest): PluginManifest
   if (contributions?.aiPresets?.length && !hasPermission(manifest, 'ai')) {
     issues.push({ path: 'contributes.aiPresets', message: 'AI preset contributions require the ai permission' })
   }
+  if (contributions?.aiProviders?.length && !hasPermission(manifest, 'ai')) {
+    issues.push({ path: 'contributes.aiProviders', message: 'AI provider contributions require the ai permission' })
+  }
   if ((contributions?.markdown?.length || contributions?.markdownIt?.length) && !hasPermission(manifest, 'markdown')) {
     issues.push({ path: 'contributes.markdown', message: 'Markdown contributions require the markdown permission' })
   }
@@ -57,6 +60,7 @@ export function validatePluginManifest(manifest: PluginManifest): PluginManifest
   pushDuplicateIssues(issues, 'contributes.commands', contributions?.commands?.map((item) => item.id) ?? [])
   pushDuplicateIssues(issues, 'contributes.markdown', contributions?.markdown?.map((item) => item.id) ?? [])
   pushDuplicateIssues(issues, 'contributes.aiPresets', contributions?.aiPresets?.map((item) => item.id) ?? [])
+  pushDuplicateIssues(issues, 'contributes.aiProviders', contributions?.aiProviders?.map((item) => item.id) ?? [])
   pushDuplicateIssues(issues, 'contributes.panels', contributions?.panels?.map((item) => item.id) ?? [])
   pushDuplicateIssues(issues, 'contributes.themes', contributions?.themes?.map((item) => item.id) ?? [])
 

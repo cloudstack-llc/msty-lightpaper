@@ -1,0 +1,28 @@
+{
+  "id": "lightpaper.markdown-powerpack",
+  "name": "Markdown Power Pack",
+  "version": "0.1.0",
+  "description": "Curated Markdown power tools: wiki-link rendering, callouts, lint reports, frontmatter-safe normalization, and table formatting.",
+  "author": "Msty LightPaper",
+  "main": "index.ts",
+  "permissions": ["commands", "markdown", "metadata"],
+  "contributes": {
+    "commands": [
+      { "id": "powerpack.insertCallout", "title": "Power Pack: Insert Callout", "category": "Markdown" },
+      { "id": "powerpack.auditMarkdown", "title": "Power Pack: Audit Markdown", "category": "Markdown" },
+      { "id": "powerpack.normalizeMarkdown", "title": "Power Pack: Normalize Markdown", "category": "Markdown" },
+      { "id": "powerpack.formatTable", "title": "Power Pack: Format Table", "category": "Markdown" }
+    ],
+    "markdown": [
+      {
+        "id": "powerpack.wikilinks",
+        "kind": "remark",
+        "description": "Converts [[wiki links]] into preview links."
+      }
+    ]
+  },
+  "enabled": false,
+  "builtin": false,
+  "sample": true,
+  "installedPath": "plugins/samples/markdown-power-pack"
+}

@@ -50,6 +50,7 @@ beforeEach(() => {
     samplePlugins: [],
     pluginCommands: [],
     pluginAiPresets: [],
+    pluginAiProviders: [],
     loading: false,
     lastError: undefined,
     lastAction: undefined,
@@ -92,5 +93,18 @@ describe('useAppStore plugin integration', () => {
     expect(pluginOutput.text).toBe('We use this to ship.')
     expect(bridgeOutput.text).toBe('bridge fallback')
     expect(runAi).toHaveBeenCalledOnce()
+  })
+
+  it('passes the selected model provider config into AI actions', async () => {
+    const provider = samplePlugins.find((plugin) => plugin.id === 'lightpaper.model-provider-catalog')!
+    const runAi = vi.fn().mockResolvedValue({ text: 'bridge fallback' })
+    window.lightpaper = bridge({ seedPlugins: vi.fn().mockResolvedValue([{ ...provider, enabled: true }]), runAi })
+
+    await useAppStore.getState().hydrate()
+    await useAppStore.getState().updateSettings({ selectedAiModelId: 'llama-local' })
+    await useAppStore.getState().runAiAction({ presetId: 'summary', text: 'Fallback text.' })
+
+    expect(runAi.mock.calls[0]?.[0].model.name).toBe('Llama local')
+    expect(runAi.mock.calls[0]?.[0].provider.name).toBe('Ollama Local')
   })
 })

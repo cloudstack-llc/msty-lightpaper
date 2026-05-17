@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { ensureBundledPluginsActivated, getPluginAiPreset, getPluginCommand, listPluginAiPresets, listPluginCommands, runPluginAiPreset, type RegisteredAiPreset, type RegisteredCommand } from '@/lib/plugin-runtime'
+import { ensureBundledPluginsActivated, getPluginAiModel, getPluginAiPreset, getPluginCommand, listPluginAiPresets, listPluginAiProviders, listPluginCommands, runPluginAiPreset, type RegisteredAiPreset, type RegisteredAiProvider, type RegisteredCommand } from '@/lib/plugin-runtime'
 import type { AiActionInput, AiActionOutput, AppSettings, FileNode, PluginRecord, Workspace } from '@shared/types'
 
 type WorkspaceTree = { workspace: Workspace; tree: FileNode[]; loading?: boolean; error?: string }
@@ -16,6 +16,7 @@ type State = {
   samplePlugins: PluginRecord[]
   pluginCommands: RegisteredCommand[]
   pluginAiPresets: RegisteredAiPreset[]
+  pluginAiProviders: RegisteredAiProvider[]
   loading: boolean
   lastError?: string
   lastAction?: string
@@ -118,6 +119,7 @@ export const useAppStore = create<State>((set, get) => ({
   samplePlugins: [],
   pluginCommands: [],
   pluginAiPresets: [],
+  pluginAiProviders: [],
   loading: false,
   setActiveFile: (path) => set({ activeFile: path }),
   setContent: (content) => set({ content }),
@@ -137,6 +139,7 @@ export const useAppStore = create<State>((set, get) => ({
       samplePlugins,
       pluginCommands: listPluginCommands(),
       pluginAiPresets: listPluginAiPresets(),
+      pluginAiProviders: listPluginAiProviders(),
       activeWorkspace: workspaces[0],
       workspaceTrees: workspaces.map((workspace) => ({ workspace, tree: [], loading: true })),
       loading: false,
@@ -265,23 +268,23 @@ export const useAppStore = create<State>((set, get) => ({
   seedPlugins: async () => {
     const [plugins, samplePlugins] = await Promise.all([window.lightpaper.seedPlugins(), window.lightpaper.listSamplePlugins()]) as [PluginRecord[], PluginRecord[]]
     await ensureBundledPluginsActivated(plugins)
-    set({ plugins, samplePlugins, pluginCommands: listPluginCommands(), pluginAiPresets: listPluginAiPresets() })
+    set({ plugins, samplePlugins, pluginCommands: listPluginCommands(), pluginAiPresets: listPluginAiPresets(), pluginAiProviders: listPluginAiProviders() })
   },
   setPluginEnabled: async (id, enabled) => {
     const plugins = await window.lightpaper.setPluginEnabled(id, enabled) as PluginRecord[]
     await ensureBundledPluginsActivated(plugins)
-    set({ plugins, pluginCommands: listPluginCommands(), pluginAiPresets: listPluginAiPresets(), lastAction: `${enabled ? 'Enabled' : 'Disabled'} ${plugins.find((plugin) => plugin.id === id)?.name ?? id}`, lastError: undefined })
+    set({ plugins, pluginCommands: listPluginCommands(), pluginAiPresets: listPluginAiPresets(), pluginAiProviders: listPluginAiProviders(), lastAction: `${enabled ? 'Enabled' : 'Disabled'} ${plugins.find((plugin) => plugin.id === id)?.name ?? id}`, lastError: undefined })
   },
   installSamplePlugin: async (id) => {
     const plugins = await window.lightpaper.installSamplePlugin(id) as PluginRecord[]
     await ensureBundledPluginsActivated(plugins)
-    set({ plugins, pluginCommands: listPluginCommands(), pluginAiPresets: listPluginAiPresets(), lastAction: `Installed ${plugins.find((plugin) => plugin.id === id)?.name ?? id}`, lastError: undefined })
+    set({ plugins, pluginCommands: listPluginCommands(), pluginAiPresets: listPluginAiPresets(), pluginAiProviders: listPluginAiProviders(), lastAction: `Installed ${plugins.find((plugin) => plugin.id === id)?.name ?? id}`, lastError: undefined })
   },
   uninstallPlugin: async (id) => {
     const target = get().plugins.find((plugin) => plugin.id === id)
     const plugins = await window.lightpaper.uninstallPlugin(id) as PluginRecord[]
     await ensureBundledPluginsActivated(plugins)
-    set({ plugins, pluginCommands: listPluginCommands(), pluginAiPresets: listPluginAiPresets(), lastAction: `Uninstalled ${target?.name ?? id}`, lastError: undefined })
+    set({ plugins, pluginCommands: listPluginCommands(), pluginAiPresets: listPluginAiPresets(), pluginAiProviders: listPluginAiProviders(), lastAction: `Uninstalled ${target?.name ?? id}`, lastError: undefined })
   },
   executePluginCommand: async (commandId) => {
     const command = getPluginCommand(commandId)
@@ -302,7 +305,11 @@ export const useAppStore = create<State>((set, get) => ({
     }
   },
   runAiAction: async (input) => {
-    if (input.presetId && getPluginAiPreset(input.presetId)) return runPluginAiPreset(input.presetId, input)
-    return window.lightpaper.runAi(input) as Promise<AiActionOutput>
+    const fallbackModelId = get().pluginAiProviders.flatMap((provider) => provider.models)[0]?.id
+    const selectedModelId = get().settings?.selectedAiModelId || fallbackModelId
+    const selected = selectedModelId ? getPluginAiModel(selectedModelId) : undefined
+    const enrichedInput: AiActionInput = selected ? { ...input, provider: selected.provider, model: selected.model } : input
+    if (input.presetId && getPluginAiPreset(input.presetId)) return runPluginAiPreset(input.presetId, enrichedInput)
+    return window.lightpaper.runAi(enrichedInput) as Promise<AiActionOutput>
   },
 }))
