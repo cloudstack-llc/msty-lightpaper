@@ -3,7 +3,7 @@ import { app } from 'electron'
 import path from 'node:path'
 import type { AppSettings, NoteMeta, PluginRecord, Workspace } from '../src/shared/types'
 
-const defaults: AppSettings = { theme: 'obsidian', editorMode: 'split', syncScroll: true, splitRatio: 50, fontFamily: 'sans', aiProvider: 'offline', aiModel: 'local-or-plugin' }
+const defaults: AppSettings = { theme: 'obsidian', editorMode: 'split', syncScroll: true, splitRatio: 50, fontFamily: 'mono', aiProvider: 'offline', aiModel: 'local-or-plugin' }
 
 export class LightPaperDb {
   private db: Database.Database

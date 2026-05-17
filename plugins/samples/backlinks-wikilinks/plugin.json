@@ -11,7 +11,13 @@
       { "id": "links.extractWikiLinks", "title": "Extract Wiki Links", "category": "Knowledge Base" },
       { "id": "links.insertWikiLink", "title": "Insert Wiki Link", "category": "Knowledge Base" }
     ],
-    "markdownIt": ["wikilinks"],
+    "markdown": [
+      {
+        "id": "wikilinks",
+        "kind": "remark",
+        "description": "Converts [[wiki links]] into preview links with wiki metadata."
+      }
+    ],
     "panels": [{ "id": "links.backlinks", "title": "Backlinks", "location": "right" }]
   }
 }

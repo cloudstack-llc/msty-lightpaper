@@ -1,18 +1,30 @@
-# Msty LightPaper
+# LightPaper
 
-Extensible, AI-powered, vibe-coded Markdown editor written using [Msty Claw](https://msty.ai).
+LightPaper is a local-first, plugin-first Markdown editor and previewer built with Electron, React, TypeScript, CodeMirror, and a unified/remark Markdown pipeline.
 
-It is currently somewhere between “promising desktop writing environment” and “feral plugin-first markdown spaceship.” Bring snacks.
-
-## Run it
+## Run
 
 ```bash
 npm install
 npm run dev
 ```
 
-## What is this?
+## Check
 
-LightPaper is a cross-platform Markdown editor built with Electron, React, SQLite, Tailwind, CodeMirror, and an unreasonable amount of optimism.
+```bash
+npm run typecheck
+npm test
+```
 
-The goal: write markdown locally, preview it beautifully, manage note folders, and eventually let plugins and AI turn it into whatever weirdly useful writing machine you want.
+## Architecture
+
+- [Architecture](/Users/ashokgelal/Projects/lightpaper/docs/ARCHITECTURE.md)
+- [Plugin authoring guide](/Users/ashokgelal/Projects/lightpaper/docs/PLUGIN_AUTHORING.md)
+
+## Core Ideas
+
+- Markdown rendering is AST-first through remark and rehype.
+- Plugins register explicit contributions through a testable `PluginHost`.
+- Plugin permissions are validated before activation and enforced during registration.
+- Sample plugins are ordinary TypeScript modules with contract tests.
+- AI features are exposed through plugin presets, with an offline Electron fallback for development.

@@ -5,7 +5,7 @@
   "description": "Parse, normalize, and update YAML frontmatter for titles, tags, status, descriptions, dates, and publishing metadata.",
   "author": "Msty LightPaper",
   "main": "index.ts",
-  "permissions": ["commands", "metadata"],
+  "permissions": ["commands", "metadata", "ui"],
   "contributes": {
     "commands": [
       { "id": "frontmatter.insertOrNormalize", "title": "Insert or Normalize Frontmatter", "category": "Metadata" },

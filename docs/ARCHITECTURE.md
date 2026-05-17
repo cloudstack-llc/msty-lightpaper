@@ -1,42 +1,156 @@
 # LightPaper Architecture
 
-LightPaper is a local-first, plugin-first Markdown studio.
+LightPaper is a local-first Markdown workbench with an extension host at the center. The app is still early, so the architecture favors explicit contracts, pure services, and contract tests over compatibility with the first prototype.
 
-## Stack
-- Electron latest runtime for cross-platform desktop.
-- React + Vite + TypeScript for UI.
-- CodeMirror 6 for fast editing.
-- markdown-it renderer with task lists, anchors, footnotes, syntax highlighting.
-- SQLite via better-sqlite3 for app metadata, settings, plugin registry, note metadata.
-- Tailwind/shadcn-style primitives for the design system.
+## Runtime Shape
 
-## Plugin model
-Plugins are manifest-first packages. A plugin declares permissions and contributions:
+```text
+Electron main
+  - workspace and file access
+  - settings and plugin registry persistence
+  - offline AI fallback
+
+Preload bridge
+  - narrow `window.lightpaper` API
+  - no renderer Node access
+
+React renderer
+  - editor shell
+  - CodeMirror editor
+  - unified Markdown preview
+  - plugin host and plugin-contributed commands, AI presets, panels, Markdown hooks
+```
+
+The renderer owns plugin activation for bundled/sample plugins. Electron persists plugin records and protects local file boundaries, but plugin modules are regular TypeScript modules that can be tested without Electron.
+
+## Plugin Host
+
+The host lives in [plugin-host.ts](/Users/ashokgelal/Projects/lightpaper/src/lib/plugin-host.ts). It is a pure TypeScript service with these responsibilities:
+
+- Validate manifests before activation.
+- Enforce declared permissions at registration time.
+- Register commands, AI presets, Markdown extensions, metadata access, and panels.
+- Track all contributions by plugin id.
+- Cleanly reset contributions before reactivation.
+- Record activation errors without crashing the app.
+
+The renderer singleton in [plugin-runtime.ts](/Users/ashokgelal/Projects/lightpaper/src/lib/plugin-runtime.ts) wraps the host for the app store. Tests can instantiate `PluginHost` directly and inject fake modules or fake metadata stores.
+
+## Manifest Contract
+
+Every plugin is manifest-first:
 
 ```json
 {
   "id": "lightpaper.example",
   "name": "Example",
   "version": "1.0.0",
-  "permissions": ["commands", "markdown", "ai", "ui", "metadata", "filesystem"],
+  "description": "Adds example Markdown workflows.",
+  "main": "index.ts",
+  "permissions": ["commands", "markdown"],
   "contributes": {
-    "commands": [{ "id": "example.run", "title": "Run Example" }],
-    "aiPresets": [{ "id": "tighten", "label": "Tighten prose", "prompt": "...", "scope": "selection" }],
-    "panels": [{ "id": "graph", "title": "Graph", "location": "right" }],
-    "themes": [{ "id": "dracula-paper", "label": "Dracula Paper", "cssFile": "theme.css" }]
+    "commands": [
+      { "id": "example.run", "title": "Run Example", "category": "Examples" }
+    ],
+    "markdown": [
+      { "id": "example.syntax", "kind": "remark", "description": "Transforms example syntax." }
+    ]
   }
 }
 ```
 
-The API surface is intentionally broad: commands, Markdown render hooks, AI presets/providers, metadata, and UI panels. The current app seeds built-in plugin records and defines contracts in `src/shared/plugin-api.ts`; dynamic plugin loading is the next implementation slice.
+Manifests are checked by [plugin-manifest.ts](/Users/ashokgelal/Projects/lightpaper/src/lib/plugin-manifest.ts). A contribution must have the matching permission:
 
-## AI ideas baked into the design
-- Provider plugins: OpenAI-compatible endpoints, Ollama/local models, Anthropic, custom company gateway.
-- AI command presets: summarize, tag, rewrite, critique, outline, continue, convert meeting notes to tasks.
-- Inline transforms: selected text can be rewritten, shortened, expanded, translated, or tone-shifted.
-- Metadata intelligence: auto tags, summaries, related-note suggestions, backlinks, stale-note detection.
-- Writing coach plugins: style guide enforcement, reading level, argument gaps, contradiction finder.
-- Knowledge workflows: turn folder into a map, generate index notes, synthesize weekly journals.
+- `commands` for command contributions.
+- `ai` for AI presets.
+- `markdown` for remark or rehype extensions.
+- `ui` for panels.
+- `metadata` for per-plugin document metadata.
 
-## Safety
-The Electron preload exposes a narrow API. File operations are checked to remain inside the selected workspace. Plugin permissions are explicit so the loader can enforce capability boundaries.
+## Plugin API
+
+The public plugin API is defined in [plugin-api.ts](/Users/ashokgelal/Projects/lightpaper/src/shared/plugin-api.ts).
+
+```ts
+export async function activate(api: LightPaperPluginApi) {
+  api.commands.register('example.insert', 'Insert Example', (ctx) => {
+    return ctx.insertText('\nExample\n')
+  })
+
+  api.markdown.registerRemarkPlugin('example.syntax', remarkExampleSyntax)
+
+  api.ai.registerPreset('example.rewrite', 'Rewrite Example', async (input) => {
+    return { text: input.text.toUpperCase() }
+  })
+}
+```
+
+Registrations return disposables. The host also removes every contribution when it reactivates all plugins, so toggling plugins is deterministic.
+
+## Markdown Pipeline
+
+Markdown rendering lives in [markdown-pipeline.ts](/Users/ashokgelal/Projects/lightpaper/src/lib/markdown-pipeline.ts). LightPaper uses unified:
+
+```text
+source Markdown
+  -> remark-parse
+  -> remark-gfm
+  -> remark-frontmatter
+  -> remark-directive
+  -> built-in LightPaper callout transform
+  -> plugin remark extensions
+  -> remark-rehype
+  -> plugin rehype extensions
+  -> rehype-slug
+  -> rehype-highlight
+  -> rehype-sanitize
+  -> LightPaper link policy
+  -> rehype-stringify
+```
+
+Plugins get two normal extension layers:
+
+- Remark plugins operate on Markdown AST, which is best for semantics like backlinks, frontmatter, outlines, linting, and AI section extraction.
+- Rehype plugins operate on HTML AST, which is best for preview output, anchors, code blocks, and safe rendered decorations.
+
+The sanitizer allows LightPaper-owned classes such as `callout`, `callout-note`, `markdown-link`, and `wiki-link`, plus the `lightpaper://wiki/...` protocol used by wiki-link preview output.
+
+## App State
+
+The Zustand store in [app-store.ts](/Users/ashokgelal/Projects/lightpaper/src/store/app-store.ts) is the renderer orchestration layer:
+
+- Hydrates workspaces, settings, installed plugins, and sample catalog from Electron.
+- Activates enabled plugin records through the plugin runtime.
+- Exposes active plugin commands and AI presets to panels.
+- Routes plugin AI preset calls before falling back to Electron's offline AI stub.
+- Keeps file content and saved content separate so dirty state is explicit.
+
+The store still talks to `window.lightpaper`, but tests replace that bridge with a fake object.
+
+## Styling Model
+
+The UI is styled by stable tokens in [globals.css](/Users/ashokgelal/Projects/lightpaper/src/styles/globals.css):
+
+- Theme tokens: `--background`, `--foreground`, `--card`, `--primary`, `--accent`, and semantic variants.
+- Editor and preview tokens: `--editor-font-family`, `--preview-font-family`, `--preview-measure`, `--preview-leading`.
+- Markdown output classes: `markdown-link`, `wiki-link`, `callout`, `callout-note`, `callout-tip`, `callout-warning`, `callout-danger`, `callout-ai`.
+
+Plugins should prefer existing classes and data attributes over inline styles. Theme plugins can be added as a later extension point by registering CSS assets from the manifest.
+
+## Testing Strategy
+
+LightPaper uses Vitest with jsdom.
+
+```bash
+npm run typecheck
+npm test
+```
+
+Current coverage focuses on the architecture boundaries:
+
+- Plugin host contract tests: activation, cleanup, permissions, duplicate ids, metadata isolation, Markdown extension registration.
+- Markdown pipeline tests: GFM, callouts, sanitization, external link policy, plugin remark extensions.
+- Sample plugin tests: every sample manifest validates, every sample activates, and pure helper behavior is deterministic.
+- Store integration tests: hydration registers plugin commands and AI presets, commands mutate documents, plugin AI presets take priority over the Electron fallback.
+
+New plugins should add pure helper tests and at least one host activation test.

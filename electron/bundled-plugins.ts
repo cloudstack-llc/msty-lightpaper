@@ -84,8 +84,12 @@ export const samplePlugins: SamplePluginRecord[] = [
           "category": "Knowledge Base"
         }
       ],
-      "markdownIt": [
-        "wikilinks"
+      "markdown": [
+        {
+          "id": "wikilinks",
+          "kind": "remark",
+          "description": "Converts [[wiki links]] into preview links with wiki metadata."
+        }
       ],
       "panels": [
         {
@@ -179,7 +183,8 @@ export const samplePlugins: SamplePluginRecord[] = [
     "main": "index.ts",
     "permissions": [
       "commands",
-      "metadata"
+      "metadata",
+      "ui"
     ],
     "contributes": {
       "commands": [

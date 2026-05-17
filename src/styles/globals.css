@@ -40,6 +40,32 @@
 @font-face { font-family: JetBrainsMono; src: local("JetBrains Mono"); font-weight: 100 800; }
 @font-face { font-family: Literata; src: local("Literata"); font-weight: 200 900; }
 
+:root {
+  --editor-font-family: JetBrainsMono, SFMono-Regular, ui-monospace, monospace;
+  --preview-font-family: InterVariable, Inter, ui-sans-serif, system-ui, sans-serif;
+  --preview-measure: 74ch;
+  --preview-leading: 1.72;
+  --workbench-border: hsl(var(--border) / .82);
+  --workbench-rail: hsl(var(--card) / .72);
+  --editor-caret: hsl(var(--primary));
+  --editor-selection: hsl(var(--primary) / .28);
+}
+
+:root[data-editor-font="sans"] {
+  --editor-font-family: InterVariable, Inter, ui-sans-serif, system-ui, sans-serif;
+  --preview-font-family: InterVariable, Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+:root[data-editor-font="serif"] {
+  --editor-font-family: Literata, Georgia, ui-serif, serif;
+  --preview-font-family: Literata, Georgia, ui-serif, serif;
+}
+
+:root[data-editor-font="mono"] {
+  --editor-font-family: JetBrainsMono, SFMono-Regular, ui-monospace, monospace;
+  --preview-font-family: InterVariable, Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
 :root,
 .theme-obsidian {
   --background: 220 18% 5%;
@@ -157,19 +183,28 @@ body { margin: 0; background: hsl(var(--background)); color: hsl(var(--foregroun
 button, input, select { font: inherit; }
 .titlebar-drag { -webkit-app-region: drag; }
 .titlebar-no-drag { -webkit-app-region: no-drag; }
-.prose-lightpaper { max-width: none; line-height: 1.75; color: hsl(var(--foreground)); }
-.prose-lightpaper h1 { font-size: 2.4rem; line-height: 1.05; letter-spacing: -0.05em; margin: 1.5rem 0 1rem; }
-.prose-lightpaper h2 { font-size: 1.65rem; margin: 2rem 0 .75rem; letter-spacing: -0.035em; }
+.prose-lightpaper { max-width: none; font-family: var(--preview-font-family); line-height: var(--preview-leading); color: hsl(var(--foreground)); }
+.prose-lightpaper h1 { font-size: 2.35rem; line-height: 1.08; letter-spacing: 0; margin: 1.5rem 0 1rem; }
+.prose-lightpaper h2 { font-size: 1.58rem; margin: 2rem 0 .75rem; letter-spacing: 0; }
 .prose-lightpaper h3 { font-size: 1.2rem; margin: 1.5rem 0 .5rem; }
 .prose-lightpaper p, .prose-lightpaper li { color: hsl(var(--foreground) / .88); }
-.prose-lightpaper a { color: hsl(var(--accent)); text-decoration: none; }
+.prose-lightpaper a { color: hsl(var(--accent)); text-decoration: none; text-underline-offset: .18em; }
+.prose-lightpaper a:hover { text-decoration: underline; }
+.prose-lightpaper a.markdown-link { border-bottom: 1px solid hsl(var(--accent) / .38); }
+.prose-lightpaper a.wiki-link { border-radius: .35rem; background: hsl(var(--primary) / .10); padding: .06rem .28rem; color: hsl(var(--primary)); }
 .prose-lightpaper blockquote { margin: 1rem 0; padding: .8rem 1rem; border-left: 3px solid hsl(var(--primary)); background: hsl(var(--muted) / .55); border-radius: .4rem; }
 .prose-lightpaper code { font-family: JetBrainsMono, monospace; background: hsl(var(--muted)); padding: .15rem .35rem; border-radius: .35rem; }
 .prose-lightpaper pre { overflow: auto; padding: 1rem; border-radius: .8rem; background: hsl(220 20% 4%); border: 1px solid hsl(var(--border)); }
 .prose-lightpaper table { width: 100%; border-collapse: collapse; }
 .prose-lightpaper th, .prose-lightpaper td { border: 1px solid hsl(var(--border)); padding: .5rem .7rem; }
-.prose-lightpaper .callout { display:block; padding: 1rem; border: 1px solid hsl(var(--primary) / .35); background: hsl(var(--primary) / .08); border-radius: .9rem; }
-.cm-editor { height: 100%; background: transparent; color: hsl(var(--foreground)); font-family: JetBrainsMono, monospace; font-size: 14px; }
+.prose-lightpaper .callout { display:block; margin: 1.1rem 0; padding: .9rem 1rem; border: 1px solid hsl(var(--primary) / .34); border-left-width: 4px; background: hsl(var(--primary) / .08); border-radius: .55rem; }
+.prose-lightpaper .callout-title { margin: 0 0 .35rem; color: hsl(var(--foreground)); font-size: .82rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.prose-lightpaper .callout-note { border-color: hsl(var(--accent) / .38); background: hsl(var(--accent) / .08); }
+.prose-lightpaper .callout-tip { border-color: hsl(138 54% 54% / .42); background: hsl(138 54% 54% / .08); }
+.prose-lightpaper .callout-warning { border-color: hsl(43 80% 60% / .48); background: hsl(43 80% 60% / .10); }
+.prose-lightpaper .callout-danger { border-color: hsl(var(--destructive) / .52); background: hsl(var(--destructive) / .10); }
+.prose-lightpaper .callout-ai { border-color: hsl(var(--primary) / .48); background: linear-gradient(90deg, hsl(var(--primary) / .12), hsl(var(--accent) / .07)); }
+.cm-editor { height: 100%; background: transparent; color: hsl(var(--foreground)); font-family: var(--editor-font-family); font-size: 14px; }
 .cm-scroller { padding: 28px 24px 80px; }
 .cm-focused { outline: none !important; }
 .cm-gutters { background: transparent !important; border-right: 1px solid hsl(var(--border)) !important; color: hsl(var(--muted-foreground)) !important; }

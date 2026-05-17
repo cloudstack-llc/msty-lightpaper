@@ -18,7 +18,8 @@ export default function App() {
   useEffect(() => { hydrate() }, [hydrate])
   useEffect(() => {
     document.documentElement.className = `theme-${settings?.theme ?? 'obsidian'} dark`
-  }, [settings?.theme])
+    document.documentElement.dataset.editorFont = settings?.fontFamily ?? 'mono'
+  }, [settings?.fontFamily, settings?.theme])
   return <div className="flex h-screen overflow-hidden bg-background text-foreground">
     {sidebarOpen && <Sidebar />}
     <section className="relative flex min-w-0 flex-1 flex-col">
