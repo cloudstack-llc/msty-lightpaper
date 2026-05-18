@@ -1,0 +1,1 @@
+{"id":"lightpaper.outline-forge","name":"Outline Forge","version":"0.1.0","description":"Outliner-style heading extraction and structured outline insertion for long notes.","author":"Msty LightPaper","main":"index.ts","permissions":["commands"],"contributes":{"commands":[{"id":"outlineForge.insertOutline","title":"Insert Structured Outline","category":"Editing"}]}}

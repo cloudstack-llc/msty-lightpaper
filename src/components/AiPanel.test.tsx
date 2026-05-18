@@ -27,6 +27,8 @@ function setPanelState() {
       syncScroll: true,
       splitRatio: 50,
       fontFamily: 'mono',
+      layoutMode: 'standard',
+      themeSettings: {},
       aiProvider: 'offline',
       aiModel: 'local-or-plugin',
     },

@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { ensureBundledPluginsActivated, getPluginAiModel, getPluginAiPreset, getPluginCommand, listPluginAiPresets, listPluginAiProviders, listPluginCommands, runPluginAiPreset, type RegisteredAiPreset, type RegisteredAiProvider, type RegisteredCommand } from '@/lib/plugin-runtime'
+import { ensureBundledPluginsActivated, getPluginAiModel, getPluginAiPreset, getPluginCommand, listPluginAiPresets, listPluginAiProviders, listPluginCommands, listPluginPanels, listPluginThemes, runPluginAiPreset, type RegisteredAiPreset, type RegisteredAiProvider, type RegisteredCommand, type RegisteredPanel, type RegisteredTheme } from '@/lib/plugin-runtime'
 import type { AiActionInput, AiActionOutput, AppSettings, FileNode, PluginRecord, Workspace } from '@shared/types'
 
 type WorkspaceTree = { workspace: Workspace; tree: FileNode[]; loading?: boolean; error?: string }
@@ -17,6 +17,8 @@ type State = {
   pluginCommands: RegisteredCommand[]
   pluginAiPresets: RegisteredAiPreset[]
   pluginAiProviders: RegisteredAiProvider[]
+  pluginPanels: RegisteredPanel[]
+  pluginThemes: RegisteredTheme[]
   loading: boolean
   lastError?: string
   lastAction?: string
@@ -120,6 +122,8 @@ export const useAppStore = create<State>((set, get) => ({
   pluginCommands: [],
   pluginAiPresets: [],
   pluginAiProviders: [],
+  pluginPanels: [],
+  pluginThemes: [],
   loading: false,
   setActiveFile: (path) => set({ activeFile: path }),
   setContent: (content) => set({ content }),
@@ -140,6 +144,8 @@ export const useAppStore = create<State>((set, get) => ({
       pluginCommands: listPluginCommands(),
       pluginAiPresets: listPluginAiPresets(),
       pluginAiProviders: listPluginAiProviders(),
+      pluginPanels: listPluginPanels(),
+      pluginThemes: listPluginThemes(),
       activeWorkspace: workspaces[0],
       workspaceTrees: workspaces.map((workspace) => ({ workspace, tree: [], loading: true })),
       loading: false,
@@ -268,28 +274,33 @@ export const useAppStore = create<State>((set, get) => ({
   seedPlugins: async () => {
     const [plugins, samplePlugins] = await Promise.all([window.lightpaper.seedPlugins(), window.lightpaper.listSamplePlugins()]) as [PluginRecord[], PluginRecord[]]
     await ensureBundledPluginsActivated(plugins)
-    set({ plugins, samplePlugins, pluginCommands: listPluginCommands(), pluginAiPresets: listPluginAiPresets(), pluginAiProviders: listPluginAiProviders() })
+    set({ plugins, samplePlugins, pluginCommands: listPluginCommands(), pluginAiPresets: listPluginAiPresets(), pluginAiProviders: listPluginAiProviders(), pluginPanels: listPluginPanels(), pluginThemes: listPluginThemes() })
   },
   setPluginEnabled: async (id, enabled) => {
     const plugins = await window.lightpaper.setPluginEnabled(id, enabled) as PluginRecord[]
     await ensureBundledPluginsActivated(plugins)
-    set({ plugins, pluginCommands: listPluginCommands(), pluginAiPresets: listPluginAiPresets(), pluginAiProviders: listPluginAiProviders(), lastAction: `${enabled ? 'Enabled' : 'Disabled'} ${plugins.find((plugin) => plugin.id === id)?.name ?? id}`, lastError: undefined })
+    set({ plugins, pluginCommands: listPluginCommands(), pluginAiPresets: listPluginAiPresets(), pluginAiProviders: listPluginAiProviders(), pluginPanels: listPluginPanels(), pluginThemes: listPluginThemes(), lastAction: `${enabled ? 'Enabled' : 'Disabled'} ${plugins.find((plugin) => plugin.id === id)?.name ?? id}`, lastError: undefined })
   },
   installSamplePlugin: async (id) => {
     const plugins = await window.lightpaper.installSamplePlugin(id) as PluginRecord[]
     await ensureBundledPluginsActivated(plugins)
-    set({ plugins, pluginCommands: listPluginCommands(), pluginAiPresets: listPluginAiPresets(), pluginAiProviders: listPluginAiProviders(), lastAction: `Installed ${plugins.find((plugin) => plugin.id === id)?.name ?? id}`, lastError: undefined })
+    set({ plugins, pluginCommands: listPluginCommands(), pluginAiPresets: listPluginAiPresets(), pluginAiProviders: listPluginAiProviders(), pluginPanels: listPluginPanels(), pluginThemes: listPluginThemes(), lastAction: `Installed ${plugins.find((plugin) => plugin.id === id)?.name ?? id}`, lastError: undefined })
   },
   uninstallPlugin: async (id) => {
     const target = get().plugins.find((plugin) => plugin.id === id)
     const plugins = await window.lightpaper.uninstallPlugin(id) as PluginRecord[]
     await ensureBundledPluginsActivated(plugins)
-    set({ plugins, pluginCommands: listPluginCommands(), pluginAiPresets: listPluginAiPresets(), pluginAiProviders: listPluginAiProviders(), lastAction: `Uninstalled ${target?.name ?? id}`, lastError: undefined })
+    set({ plugins, pluginCommands: listPluginCommands(), pluginAiPresets: listPluginAiPresets(), pluginAiProviders: listPluginAiProviders(), pluginPanels: listPluginPanels(), pluginThemes: listPluginThemes(), lastAction: `Uninstalled ${target?.name ?? id}`, lastError: undefined })
   },
   executePluginCommand: async (commandId) => {
     const command = getPluginCommand(commandId)
     if (!command) return set({ lastError: `Plugin command not found: ${commandId}` })
     const snapshot = get()
+    const plugin = snapshot.plugins.find((candidate) => candidate.id === command.pluginId)
+    const canUseSettings = plugin?.permissions.includes('settings') ?? false
+    const requireSettingsPermission = () => {
+      if (!canUseSettings) throw new Error(`${command.pluginId} requested settings without declaring the permission`)
+    }
     try {
       await command.handler({
         activeFile: snapshot.activeFile,
@@ -298,6 +309,16 @@ export const useAppStore = create<State>((set, get) => ({
         replaceSelection: async (text) => set({ content: text }),
         insertText: async (text) => set({ content: `${get().content}${text}` }),
         showToast: (message) => set({ lastAction: message, lastError: undefined }),
+        getSettings: () => {
+          requireSettingsPermission()
+          const settings = get().settings
+          if (!settings) throw new Error('Settings are not loaded')
+          return settings
+        },
+        updateSettings: async (next) => {
+          requireSettingsPermission()
+          await get().updateSettings(next)
+        },
       })
       set({ lastAction: `Ran ${command.title}`, lastError: undefined })
     } catch (error) {

@@ -32,4 +32,9 @@ export async function activate(api: LightPaperPluginApi) {
     const urls = extractLinks(ctx.documentText || '').filter((link) => /^https?:\/\//.test(link.href)).map((link) => `- ${link.href}`)
     return ctx.insertText(`\n\n## Remote URLs\n\n${urls.join('\n') || 'No remote URLs found.'}\n`)
   })
+  api.ui.registerPanel('links.report', 'Link Report', () => {
+    const element = document.createElement('div')
+    element.innerHTML = '<div class="lp-plugin-panel"><p class="lp-panel-kicker">Document quality</p><h3>Link report</h3><p>Runs local heading, image-alt, and URL structure checks without leaving the plugin host contract.</p></div>'
+    return element
+  })
 }

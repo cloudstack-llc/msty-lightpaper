@@ -8,6 +8,8 @@ const settings = {
   syncScroll: true,
   splitRatio: 50,
   fontFamily: 'mono',
+  layoutMode: 'standard',
+  themeSettings: {},
   aiProvider: 'offline',
   aiModel: 'local-or-plugin',
 } as const
@@ -59,6 +61,8 @@ beforeEach(() => {
     pluginCommands: [],
     pluginAiPresets: [],
     pluginAiProviders: [],
+    pluginPanels: [],
+    pluginThemes: [],
     loading: false,
     lastError: undefined,
     lastAction: undefined,
@@ -87,6 +91,19 @@ describe('useAppStore plugin integration', () => {
 
     expect(useAppStore.getState().content).toContain('## Plan')
     expect(useAppStore.getState().lastAction).toBe('Ran Insert Today Template')
+  })
+
+  it('lets permitted plugin commands update app settings', async () => {
+    const minimal = samplePlugins.find((plugin) => plugin.id === 'lightpaper.minimal-workspace')!
+    const setSettings = vi.fn().mockResolvedValue(settings)
+    window.lightpaper = bridge({ seedPlugins: vi.fn().mockResolvedValue([{ ...minimal, enabled: true }]), setSettings })
+
+    await useAppStore.getState().hydrate()
+    await useAppStore.getState().executePluginCommand('minimal.layoutWide')
+
+    expect(useAppStore.getState().settings?.theme).toBe('minimal-workspace')
+    expect(useAppStore.getState().settings?.layoutMode).toBe('wide')
+    expect(setSettings.mock.calls[0]?.[0]).toMatchObject({ theme: 'minimal-workspace', layoutMode: 'wide' })
   })
 
   it('routes plugin AI presets before falling back to the Electron bridge', async () => {

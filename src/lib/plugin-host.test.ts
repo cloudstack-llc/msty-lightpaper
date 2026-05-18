@@ -156,6 +156,18 @@ describe('PluginHost', () => {
     expect(host.listAiProviders()).toHaveLength(1)
     expect(host.getAiModel('test-model')?.provider.name).toBe('Test Provider')
   })
+
+  it('exposes manifest theme contributions for enabled plugins', async () => {
+    const module: LightPaperPluginModule = { activate() {} }
+    const host = new PluginHost({ modules: { 'test.plugin': module } })
+
+    await host.activatePlugins([plugin({
+      permissions: [],
+      contributes: { themes: [{ id: 'test-theme', label: 'Test Theme', modes: ['dark'], inspiration: 'Test source', cssFile: 'theme.css' }] },
+    })])
+
+    expect(host.listThemes()).toEqual([{ id: 'test-theme', label: 'Test Theme', modes: ['dark'], inspiration: 'Test source', cssFile: 'theme.css', pluginId: 'test.plugin', pluginName: 'Test Plugin' }])
+  })
 })
 
 describe('validatePluginManifest', () => {
@@ -163,11 +175,12 @@ describe('validatePluginManifest', () => {
     const result = validatePluginManifest(plugin({
       id: '',
       permissions: ['commands'],
-      contributes: { commands: [{ id: 'same', title: 'One' }, { id: 'same', title: 'Two' }] },
+      contributes: { commands: [{ id: 'same', title: 'One' }, { id: 'same', title: 'Two' }], themes: [{ id: 'theme', label: 'Theme', cssFile: '../theme.css' }] },
     }))
 
     expect(result.ok).toBe(false)
     expect(result.issues.map((issue) => issue.path)).toContain('id')
+    expect(result.issues.map((issue) => issue.path)).toContain('contributes.themes.0.cssFile')
     expect(result.issues.map((issue) => issue.message).join('\n')).toContain('Duplicate contribution id')
   })
 })

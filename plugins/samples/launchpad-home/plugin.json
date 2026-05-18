@@ -1,0 +1,1 @@
+{"id":"lightpaper.launchpad-home","name":"Launchpad Home","version":"0.1.0","description":"Homepage-style note dashboards with continue, open-task, and link sections.","author":"Msty LightPaper","main":"index.ts","permissions":["commands"],"contributes":{"commands":[{"id":"launchpad.insertHome","title":"Insert Workspace Launchpad","category":"Workspace"}]}}

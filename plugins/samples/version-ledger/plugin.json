@@ -1,0 +1,1 @@
+{"id":"lightpaper.version-ledger","name":"Version Ledger","version":"0.1.0","description":"Git-inspired manual note snapshots with checksum, word count, and change-note sections.","author":"Msty LightPaper","main":"index.ts","permissions":["commands"],"contributes":{"commands":[{"id":"versionLedger.insertSnapshot","title":"Insert Version Snapshot","category":"Versioning"}]}}

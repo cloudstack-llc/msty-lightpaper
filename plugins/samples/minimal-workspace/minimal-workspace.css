@@ -1,0 +1,216 @@
+.theme-minimal-workspace {
+  --background: 220 10% 12%;
+  --foreground: 220 9% 84%;
+  --card: 220 10% 14%;
+  --card-foreground: 220 9% 84%;
+  --popover: 220 10% 14%;
+  --popover-foreground: 220 9% 84%;
+  --primary: 207 42% 63%;
+  --primary-foreground: 220 10% 12%;
+  --secondary: 220 8% 18%;
+  --secondary-foreground: 220 9% 84%;
+  --muted: 220 8% 17%;
+  --muted-foreground: 220 6% 58%;
+  --accent: 207 42% 63%;
+  --accent-foreground: 220 10% 12%;
+  --destructive: 2 54% 58%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 220 7% 22%;
+  --input: 220 7% 22%;
+  --ring: 207 42% 63%;
+  --radius: 0.48rem;
+  --preview-font-family: InterVariable, Inter, ui-sans-serif, system-ui, sans-serif;
+  --preview-measure: 68ch;
+  --preview-leading: 1.74;
+  --minimal-muted-border: hsl(var(--border) / 0.52);
+}
+
+.theme-minimal-workspace[data-lp-theme-accent="mono"] {
+  --primary: 220 8% 74%;
+  --accent: 220 8% 74%;
+}
+
+.theme-minimal-workspace[data-lp-theme-accent="green"] {
+  --primary: 141 30% 58%;
+  --accent: 141 30% 58%;
+}
+
+.theme-minimal-workspace[data-lp-theme-accent="orange"] {
+  --primary: 28 64% 62%;
+  --accent: 28 64% 62%;
+}
+
+.theme-minimal-workspace[data-lp-theme-contrast="high"] {
+  --background: 220 10% 8%;
+  --card: 220 10% 11%;
+  --muted: 220 8% 14%;
+  --border: 220 7% 25%;
+}
+
+.theme-minimal-workspace[data-lp-theme-contrast="black"] {
+  --background: 0 0% 0%;
+  --card: 0 0% 6%;
+  --muted: 0 0% 9%;
+  --border: 0 0% 17%;
+}
+
+.theme-minimal-workspace[data-lp-theme-density="compact"] {
+  --preview-leading: 1.58;
+}
+
+.theme-minimal-workspace body {
+  background: hsl(var(--background));
+}
+
+.theme-minimal-workspace [data-lp-slot="toolbar"],
+.theme-minimal-workspace [data-lp-slot="sidebar"],
+.theme-minimal-workspace [data-lp-slot="right-dock"],
+.theme-minimal-workspace [data-lp-slot="bottom-dock"] {
+  background: hsl(var(--background) / 0.82);
+  border-color: var(--minimal-muted-border);
+  box-shadow: none;
+}
+
+.theme-minimal-workspace [data-lp-slot="toolbar"] {
+  height: 3.25rem;
+}
+
+.theme-minimal-workspace [data-lp-slot="sidebar"] {
+  width: 18rem;
+}
+
+.theme-minimal-workspace [data-lp-slot="right-dock"] {
+  width: 20rem;
+}
+
+.theme-minimal-workspace [data-lp-slot="editor-stage"] {
+  background: hsl(var(--background));
+}
+
+.theme-minimal-workspace[data-lp-hide-borders="true"] [data-lp-slot],
+.theme-minimal-workspace[data-lp-hide-borders="true"] [data-lp-plugin-panel],
+.theme-minimal-workspace[data-lp-hide-borders="true"] .cm-gutters {
+  border-color: transparent !important;
+}
+
+.theme-minimal-workspace[data-lp-layout="focus"] [data-lp-slot="sidebar"],
+.theme-minimal-workspace[data-lp-layout="focus"] [data-lp-slot="right-dock"],
+.theme-minimal-workspace[data-lp-layout="focus"] [data-lp-slot="bottom-dock"] {
+  width: 0 !important;
+  min-width: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.theme-minimal-workspace[data-lp-layout="focus"] [data-lp-slot="toolbar"] {
+  opacity: 0.16;
+  transition: opacity 160ms ease;
+}
+
+.theme-minimal-workspace[data-lp-layout="focus"] [data-lp-slot="toolbar"]:hover,
+.theme-minimal-workspace[data-lp-layout="focus"] [data-lp-slot="toolbar"]:focus-within {
+  opacity: 1;
+}
+
+.theme-minimal-workspace[data-lp-layout="wide"] {
+  --preview-measure: 96ch;
+}
+
+.theme-minimal-workspace[data-lp-layout="cards"] {
+  --preview-measure: 104ch;
+}
+
+.theme-minimal-workspace .cm-editor {
+  font-size: 14.5px;
+}
+
+.theme-minimal-workspace[data-lp-theme-density="compact"] .cm-editor {
+  font-size: 13.5px;
+}
+
+.theme-minimal-workspace .cm-scroller {
+  padding: 38px 44px 120px;
+}
+
+.theme-minimal-workspace[data-lp-theme-density="compact"] .cm-scroller {
+  padding: 24px 32px 96px;
+}
+
+.theme-minimal-workspace .cm-activeLine,
+.theme-minimal-workspace .cm-activeLineGutter {
+  background: hsl(var(--muted) / 0.46) !important;
+}
+
+.theme-minimal-workspace .cm-gutters {
+  background: transparent !important;
+  color: hsl(var(--muted-foreground) / 0.72) !important;
+}
+
+.theme-minimal-workspace .prose-lightpaper {
+  font-size: 1rem;
+}
+
+.theme-minimal-workspace .prose-lightpaper h1 {
+  margin-top: .2rem;
+  font-size: 2.05rem;
+  font-weight: 760;
+  line-height: 1.16;
+}
+
+.theme-minimal-workspace .prose-lightpaper h2 {
+  margin-top: 2.1rem;
+  color: hsl(var(--foreground));
+  font-size: 1.28rem;
+  font-weight: 720;
+}
+
+.theme-minimal-workspace[data-lp-colorful-headings="true"] .prose-lightpaper h2:nth-of-type(3n + 1) { color: hsl(var(--primary)); }
+.theme-minimal-workspace[data-lp-colorful-headings="true"] .prose-lightpaper h2:nth-of-type(3n + 2) { color: hsl(141 30% 58%); }
+.theme-minimal-workspace[data-lp-colorful-headings="true"] .prose-lightpaper h2:nth-of-type(3n + 3) { color: hsl(28 64% 62%); }
+
+.theme-minimal-workspace .prose-lightpaper a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+  text-decoration-color: hsl(var(--primary) / 0.32);
+  text-underline-offset: .18em;
+}
+
+.theme-minimal-workspace .prose-lightpaper blockquote,
+.theme-minimal-workspace .prose-lightpaper .callout {
+  border-width: 0 0 0 2px;
+  border-color: hsl(var(--primary) / 0.62);
+  border-radius: 0;
+  background: transparent;
+  color: hsl(var(--foreground) / 0.82);
+}
+
+.theme-minimal-workspace .prose-lightpaper pre {
+  border-color: var(--minimal-muted-border);
+  border-radius: .6rem;
+  background: hsl(var(--card));
+}
+
+.theme-minimal-workspace .prose-lightpaper table {
+  border-color: var(--minimal-muted-border);
+}
+
+.theme-minimal-workspace .prose-lightpaper th,
+.theme-minimal-workspace .prose-lightpaper td {
+  border-color: var(--minimal-muted-border);
+}
+
+.theme-minimal-workspace .prose-lightpaper.cards tr,
+.theme-minimal-workspace .prose-lightpaper.list-cards > ul > li {
+  background: hsl(var(--card) / 0.8);
+  box-shadow: 0 18px 48px hsl(0 0% 0% / 0.14);
+}
+
+.theme-minimal-workspace .prose-lightpaper.img-grid img {
+  border-radius: .65rem;
+  filter: saturate(.92) contrast(.96);
+}
+
+.theme-minimal-workspace .lp-minimal-panel ul {
+  margin: .8rem 0 0;
+  padding-left: 1.1rem;
+}

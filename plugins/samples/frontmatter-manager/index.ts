@@ -36,4 +36,9 @@ export async function activate(api: LightPaperPluginApi) {
   api.commands.register('frontmatter.insertOrNormalize', 'Insert or Normalize Frontmatter', normalize)
   api.commands.register('frontmatter.touchUpdatedAt', 'Touch updatedAt Frontmatter', async (ctx) => { const parsed = parseFrontmatter(ctx.documentText || ''); parsed.data.updated = new Date().toISOString(); await ctx.replaceSelection(stringifyFrontmatter(parsed.data) + parsed.body); ctx.showToast('updatedAt refreshed') })
   api.commands.register('frontmatter.extractTitleTags', 'Extract Title and Tags', async (ctx) => { const parsed = parseFrontmatter(ctx.documentText || ''); parsed.data.title = titleFromBody(parsed.body); parsed.data.tags = tagsFromBody(parsed.body); await ctx.replaceSelection(stringifyFrontmatter(parsed.data) + parsed.body); ctx.showToast('Title and tags extracted') })
+  api.ui.registerPanel('frontmatter.panel', 'Frontmatter', () => {
+    const element = document.createElement('div')
+    element.innerHTML = '<div class="lp-plugin-panel"><p class="lp-panel-kicker">Document metadata</p><h3>Frontmatter</h3><p>Normalize YAML fields, then use <code>cssClasses</code> to turn on theme helper layouts such as cards, image grids, and wide tables.</p></div>'
+    return element
+  })
 }

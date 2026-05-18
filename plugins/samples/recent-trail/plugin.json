@@ -1,0 +1,1 @@
+{"id":"lightpaper.recent-trail","name":"Recent Trail","version":"0.1.0","description":"Recent-files inspired manual trail entries for the active note.","author":"Msty LightPaper","main":"index.ts","permissions":["commands"],"contributes":{"commands":[{"id":"recentTrail.recordCurrent","title":"Record Current Note Trail","category":"Workspace"}]}}

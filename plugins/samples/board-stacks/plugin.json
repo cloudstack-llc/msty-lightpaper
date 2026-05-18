@@ -1,0 +1,1 @@
+{"id":"lightpaper.board-stacks","name":"Board Stacks","version":"0.1.0","description":"Markdown-backed board scaffolds that organize open and completed tasks into columns.","author":"Msty LightPaper","main":"index.ts","permissions":["commands"],"contributes":{"commands":[{"id":"boardStacks.fromTasks","title":"Create Board From Tasks","category":"Planning"}]}}

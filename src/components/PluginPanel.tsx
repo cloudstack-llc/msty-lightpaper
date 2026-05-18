@@ -1,15 +1,57 @@
-import { Boxes, CheckCircle2, Cpu, Download, Puzzle, Shield, Sparkles, TerminalSquare, Trash2, X } from 'lucide-react'
+import { Boxes, CheckCircle2, Cpu, Download, Palette, Puzzle, Shield, Sparkles, TerminalSquare, Trash2, X } from 'lucide-react'
 import { useMemo } from 'react'
 import type { PluginRecord } from '@shared/types'
+import { themeClassName } from '@/lib/themes'
 import { useAppStore } from '@/store/app-store'
+
+function ThemeContributionCards({ plugin }: { plugin: PluginRecord }) {
+  const themes = plugin.contributes?.themes ?? []
+  if (!themes.length) return null
+  const canPreview = plugin.enabled
+
+  if (!canPreview) {
+    return (
+      <ul className="space-y-1 text-muted-foreground">
+        {themes.slice(0, 6).map((theme) => <li key={theme.id}>• {theme.label}{theme.cssFile ? ` / ${theme.cssFile}` : ''}</li>)}
+        {themes.length > 6 && <li>• +{themes.length - 6} more</li>}
+      </ul>
+    )
+  }
+
+  return (
+    <div className="grid gap-2 md:grid-cols-2">
+      {themes.slice(0, 6).map((theme) => (
+        <div key={theme.id} className={`overflow-hidden rounded-lg border ${themeClassName(theme.id)}`}>
+          <div className="bg-background p-2 text-foreground">
+            <div className="rounded-md border bg-card p-2">
+              <div className="mb-2 flex items-center gap-1">
+                <span className="h-2 w-2 rounded-full bg-primary" />
+                <span className="h-2 w-2 rounded-full bg-accent" />
+                <span className="h-2 w-7 rounded-full bg-muted" />
+              </div>
+              <div className="h-1.5 w-5/6 rounded bg-foreground/80" />
+              <div className="mt-1 h-1.5 w-1/2 rounded bg-muted-foreground/55" />
+            </div>
+          </div>
+          <div className="bg-card px-2 py-1.5">
+            <div className="truncate font-medium text-foreground">{theme.label}</div>
+            <div className="truncate text-[11px] text-muted-foreground">{theme.cssFile ? theme.cssFile : theme.inspiration}</div>
+          </div>
+        </div>
+      ))}
+      {themes.length > 6 && <div className="rounded-lg border bg-background p-2 text-muted-foreground">+{themes.length - 6} more themes</div>}
+    </div>
+  )
+}
 
 function ContributionSummary({ plugin }: { plugin: PluginRecord }) {
   const commands = plugin.contributes?.commands ?? []
   const panels = plugin.contributes?.panels ?? []
+  const themes = plugin.contributes?.themes ?? []
   const aiPresets = plugin.contributes?.aiPresets ?? []
   const aiProviders = plugin.contributes?.aiProviders ?? []
 
-  if (!commands.length && !panels.length && !aiPresets.length && !aiProviders.length) return null
+  if (!commands.length && !panels.length && !themes.length && !aiPresets.length && !aiProviders.length) return null
 
   return (
     <div className="mt-3 grid gap-2 text-xs md:grid-cols-3">
@@ -28,6 +70,12 @@ function ContributionSummary({ plugin }: { plugin: PluginRecord }) {
           <ul className="space-y-1 text-muted-foreground">
             {panels.map((panel) => <li key={panel.id}>• {panel.title} / {panel.location}</li>)}
           </ul>
+        </div>
+      )}
+      {themes.length > 0 && (
+        <div className="rounded-lg border bg-card/60 p-2 md:col-span-2">
+          <div className="mb-2 flex items-center gap-1.5 font-medium text-foreground"><Palette className="h-3.5 w-3.5 text-primary" /> Themes</div>
+          <ThemeContributionCards plugin={plugin} />
         </div>
       )}
       {aiPresets.length > 0 && (
@@ -61,6 +109,7 @@ export function PluginPanel({ open, onClose }: { open: boolean; onClose(): void 
       commands: enabledPlugins.reduce((count, plugin) => count + (plugin.contributes?.commands?.length ?? 0), 0),
       aiPresets: enabledPlugins.reduce((count, plugin) => count + (plugin.contributes?.aiPresets?.length ?? 0), 0),
       aiProviders: enabledPlugins.reduce((count, plugin) => count + (plugin.contributes?.aiProviders?.length ?? 0), 0),
+      themes: enabledPlugins.reduce((count, plugin) => count + (plugin.contributes?.themes?.length ?? 0), 0),
     }
   }, [plugins])
 
@@ -81,7 +130,7 @@ export function PluginPanel({ open, onClose }: { open: boolean; onClose(): void 
           <div className="rounded-xl border bg-background p-3"><Boxes className="mb-2 h-4 w-4 text-primary" /><div className="text-lg font-semibold">{plugins.length}</div><p className="text-xs text-muted-foreground">installed</p></div>
           <div className="rounded-xl border bg-background p-3"><CheckCircle2 className="mb-2 h-4 w-4 text-emerald-400" /><div className="text-lg font-semibold">{stats.enabled}</div><p className="text-xs text-muted-foreground">enabled</p></div>
           <div className="rounded-xl border bg-background p-3"><TerminalSquare className="mb-2 h-4 w-4 text-accent" /><div className="text-lg font-semibold">{stats.commands}</div><p className="text-xs text-muted-foreground">active commands</p></div>
-          <div className="rounded-xl border bg-background p-3"><Cpu className="mb-2 h-4 w-4 text-violet-400" /><div className="text-lg font-semibold">{stats.aiPresets}/{stats.aiProviders}</div><p className="text-xs text-muted-foreground">AI presets/providers</p></div>
+          <div className="rounded-xl border bg-background p-3"><Cpu className="mb-2 h-4 w-4 text-violet-400" /><div className="text-lg font-semibold">{stats.aiPresets}/{stats.aiProviders}/{stats.themes}</div><p className="text-xs text-muted-foreground">AI presets/providers/themes</p></div>
         </div>
 
         <section className="space-y-2">

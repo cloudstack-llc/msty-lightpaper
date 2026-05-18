@@ -1,0 +1,23 @@
+{
+  "id": "lightpaper.theme-gallery",
+  "name": "Theme Gallery",
+  "version": "0.1.0",
+  "description": "Ten installable sample themes inspired by popular Obsidian community theme families.",
+  "author": "Msty LightPaper",
+  "main": "index.ts",
+  "permissions": [],
+  "contributes": {
+    "themes": [
+      { "id": "quiet-focus", "label": "Quiet Focus", "modes": ["dark", "light"], "inspiration": "Minimal", "cssFile": "themes.css" },
+      { "id": "soft-things", "label": "Soft Things", "modes": ["dark", "light"], "inspiration": "Things", "cssFile": "themes.css" },
+      { "id": "blue-summit", "label": "Blue Summit", "modes": ["dark", "light"], "inspiration": "Blue Topaz", "cssFile": "themes.css" },
+      { "id": "adaptive-rose", "label": "Adaptive Rose", "modes": ["dark", "light"], "inspiration": "AnuPpuccin", "cssFile": "themes.css" },
+      { "id": "nord-desk", "label": "Nord Desk", "modes": ["dark", "light"], "inspiration": "Obsidian Nord", "cssFile": "themes.css" },
+      { "id": "atom-craft", "label": "Atom Craft", "modes": ["dark", "light"], "inspiration": "Atom", "cssFile": "themes.css" },
+      { "id": "basalt-night", "label": "Basalt Night", "modes": ["dark"], "inspiration": "Obsidianite", "cssFile": "themes.css" },
+      { "id": "amber-signal", "label": "Amber Signal", "modes": ["dark", "light"], "inspiration": "Wasp", "cssFile": "themes.css" },
+      { "id": "manuscript", "label": "Manuscript", "modes": ["dark", "light"], "inspiration": "Typewriter", "cssFile": "themes.css" },
+      { "id": "story-codex", "label": "Story Codex", "modes": ["dark", "light"], "inspiration": "ITS Theme", "cssFile": "themes.css" }
+    ]
+  }
+}

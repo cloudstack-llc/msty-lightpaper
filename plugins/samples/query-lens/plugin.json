@@ -1,0 +1,1 @@
+{"id":"lightpaper.query-lens","name":"Query Lens","version":"0.1.0","description":"Dataview-style current-note summaries for headings, tasks, tags, links, and word counts.","author":"Msty LightPaper","main":"index.ts","permissions":["commands"],"contributes":{"commands":[{"id":"queryLens.insertReport","title":"Insert Query Lens Report","category":"Knowledge Base"}]}}

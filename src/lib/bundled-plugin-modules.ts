@@ -8,7 +8,9 @@ import * as frontmatterManager from '../../plugins/samples/frontmatter-manager/i
 import * as linkChecker from '../../plugins/samples/link-checker/index'
 import * as markdownPowerPack from '../../plugins/samples/markdown-power-pack/index'
 import * as markdownLinter from '../../plugins/samples/markdown-linter/index'
+import * as minimalWorkspace from '../../plugins/samples/minimal-workspace/index'
 import * as modelProviderCatalog from '../../plugins/samples/model-provider-catalog/index'
+import { popularWorkflowModules } from '../../plugins/samples/popular-workflow-suite/index'
 import * as publisherKit from '../../plugins/samples/publisher-kit/index'
 import * as publishingSeoChecklist from '../../plugins/samples/publishing-seo-checklist/index'
 import * as snippetTemplateLibrary from '../../plugins/samples/snippet-template-library/index'
@@ -24,7 +26,9 @@ export const bundledPluginModules: Record<string, LightPaperPluginModule> = {
   'lightpaper.link-checker': linkChecker,
   'lightpaper.markdown-powerpack': markdownPowerPack,
   'lightpaper.markdown-linter': markdownLinter,
+  'lightpaper.minimal-workspace': minimalWorkspace,
   'lightpaper.model-provider-catalog': modelProviderCatalog,
+  ...popularWorkflowModules,
   'lightpaper.publisher-kit': publisherKit,
   'lightpaper.publishing-seo-checklist': publishingSeoChecklist,
   'lightpaper.snippet-template-library': snippetTemplateLibrary,

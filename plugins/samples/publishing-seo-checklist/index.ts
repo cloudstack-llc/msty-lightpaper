@@ -23,4 +23,9 @@ export function checklistMarkdown(markdown: string) {
 export async function activate(api: LightPaperPluginApi) {
   api.commands.register('publish.auditCurrentDocument', 'Audit Publishing Readiness', async (ctx) => { const audit = auditPublishingReadiness(ctx.documentText || ''); if (ctx.activeFile) await api.metadata.set(ctx.activeFile, 'publishingAudit', audit); ctx.showToast(`Publishing readiness: ${audit.score}/100 · ${audit.minutes} min read`) })
   api.commands.register('publish.insertChecklist', 'Insert Publishing Checklist', (ctx) => ctx.insertText(`\n\n${checklistMarkdown(ctx.documentText || '')}\n`))
+  api.ui.registerPanel('publish.checklist', 'Publishing Checklist', () => {
+    const element = document.createElement('div')
+    element.innerHTML = '<div class="lp-plugin-panel"><p class="lp-panel-kicker">Publishing</p><h3>Readiness checklist</h3><p>Audits titles, metadata, links, images, and reading length. Themes can style this panel through stable dock slots.</p></div>'
+    return element
+  })
 }

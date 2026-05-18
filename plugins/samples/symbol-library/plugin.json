@@ -1,0 +1,1 @@
+{"id":"lightpaper.symbol-library","name":"Symbol Library","version":"0.1.0","description":"Icon-style text badges and heading legends for visual organization without binary assets.","author":"Msty LightPaper","main":"index.ts","permissions":["commands"],"contributes":{"commands":[{"id":"symbolLibrary.insertLegend","title":"Insert Symbol Legend","category":"Editing"}]}}

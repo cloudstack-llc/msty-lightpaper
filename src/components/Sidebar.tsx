@@ -52,7 +52,7 @@ function WorkspaceRoot({ workspace, tree, loading, error }: { workspace: Workspa
 
 export function Sidebar() {
   const { workspaces, workspaceTrees, addWorkspace, loadAllTrees, lastError, lastAction } = useAppStore()
-  return <aside className="flex h-full w-80 shrink-0 flex-col border-r bg-card/55 backdrop-blur-xl">
+  return <aside data-lp-slot="sidebar" className="flex h-full w-80 shrink-0 flex-col border-r bg-card/55 backdrop-blur-xl">
     <div className="titlebar-drag h-10 shrink-0" />
     <div className="titlebar-no-drag flex items-center justify-between gap-2 border-b px-3 pb-3">
       <div className="min-w-0">

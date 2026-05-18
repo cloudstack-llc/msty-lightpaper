@@ -70,6 +70,7 @@ Manifests are checked by [plugin-manifest.ts](/Users/ashokgelal/Projects/lightpa
 - `markdown` for remark or rehype extensions.
 - `ui` for panels.
 - `metadata` for per-plugin document metadata.
+- `settings` for command-time app setting reads and writes.
 
 ## Plugin API
 
@@ -106,6 +107,8 @@ export async function activate(api: LightPaperPluginApi) {
 ```
 
 Registrations return disposables. The host also removes every contribution when it reactivates all plugins, so toggling plugins is deterministic.
+
+Command handlers receive the active document context. When the plugin declares `settings`, the renderer adds guarded `getSettings` and `updateSettings` methods to the command context; plugins without that permission get a runtime error if they try to use settings.
 
 ## Model Providers
 
@@ -149,7 +152,7 @@ The Zustand store in [app-store.ts](/Users/ashokgelal/Projects/lightpaper/src/st
 
 - Hydrates workspaces, settings, installed plugins, and sample catalog from Electron.
 - Activates enabled plugin records through the plugin runtime.
-- Exposes active plugin commands, AI presets, and model-provider catalogs to panels.
+- Exposes active plugin commands, AI presets, model-provider catalogs, docked plugin panels, and enabled plugin theme contributions to panels and theme controls.
 - Routes plugin AI preset calls before falling back to Electron's offline AI stub and passes selected model/provider config into the action input.
 - Keeps file content and saved content separate so dirty state is explicit.
 
@@ -162,8 +165,14 @@ The UI is styled by stable tokens in [globals.css](/Users/ashokgelal/Projects/li
 - Theme tokens: `--background`, `--foreground`, `--card`, `--primary`, `--accent`, and semantic variants.
 - Editor and preview tokens: `--editor-font-family`, `--preview-font-family`, `--preview-measure`, `--preview-leading`.
 - Markdown output classes: `markdown-link`, `wiki-link`, `callout`, `callout-note`, `callout-tip`, `callout-warning`, `callout-danger`, `callout-ai`.
+- Frontmatter-driven helper classes on preview roots: `cards`, `list-cards`, `cards-cols-*`, `cards-cover`, `cards-16-9`, `img-grid`, `table-wide`, `table-max`, `table-small`, `row-alt`, and related table/image/iframe helpers.
+- Workspace slot attributes: `data-lp-slot="toolbar"`, `sidebar`, `editor-stage`, `right-dock`, and `bottom-dock`.
 
-Plugins should prefer existing classes and data attributes over inline styles. Theme plugins can be added as a later extension point by registering CSS assets from the manifest.
+Enabled plugins can contribute theme records through `contributes.themes`. Theme records may name a relative `cssFile`; [plugin-theme-assets.ts](/Users/ashokgelal/Projects/lightpaper/src/lib/plugin-theme-assets.ts) resolves those records through an explicit bundled-asset allowlist, and [PluginThemeStyles.tsx](/Users/ashokgelal/Projects/lightpaper/src/components/PluginThemeStyles.tsx) mounts the CSS only while the contributing plugin is enabled.
+
+Plugin theme CSS must scope itself to `.theme-<id>` because the app applies that class to `<html>`. Themes can also declare `layoutModes`, `settings`, and `previewClasses`; settings can write CSS variables or `data-*` attributes onto `<html>`, and layout modes are exposed through `data-lp-layout`. The [Minimal Workspace sample](/Users/ashokgelal/Projects/lightpaper/plugins/samples/minimal-workspace) uses those hooks to style app chrome, focus/wide/card layout modes, plugin docks, editor spacing, frontmatter classes, tables, list cards, image grids, image filters, and alternate checkboxes. It also declares `settings` so its commands can activate the theme, change layout mode, and toggle theme flags.
+
+Arbitrary external CSS loading is still blocked until disk-loaded plugins have a reviewed asset boundary.
 
 ## Testing Strategy
 

@@ -6,6 +6,7 @@ import { SecretVault } from './secret-vault'
 import { runAiActionOffline } from './ai-service'
 import { samplePlugins } from './bundled-plugins'
 import { assertInsideWorkspace, chooseWorkspace, createEntry, deleteEntry, readFile, readTree, renameEntry, saveFile } from './fs-service'
+import { planSamplePluginRegistryRefresh } from './plugin-registry'
 import type { AiActionInput, AppSettings, CreateEntryInput, DeleteEntryInput, RenameEntryInput, SaveFileInput } from '../src/shared/types'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -56,9 +57,10 @@ ipcMain.handle('plugins:installSample', (_event, id: string) => {
 ipcMain.handle('plugins:uninstall', (_event, id: string) => { db.removePlugins([id]); return db.listPlugins() })
 ipcMain.handle('plugins:setEnabled', (_event, id: string, enabled: boolean) => { db.setPluginEnabled(id, enabled); return db.listPlugins() })
 ipcMain.handle('plugins:seed', () => {
-  const sampleIds = samplePlugins.map((plugin) => plugin.id)
-  const oldSampleRows = db.listPlugins().filter((plugin) => sampleIds.includes(plugin.id) && (plugin.sample === true || plugin.builtin === true)).map((plugin) => plugin.id)
-  if (oldSampleRows.length) db.removePlugins(oldSampleRows)
+  const installed = db.listPlugins()
+  const plan = planSamplePluginRegistryRefresh(installed, samplePlugins)
+  if (plan.removeIds.length) db.removePlugins(plan.removeIds)
+  for (const plugin of plan.refreshPlugins) db.upsertPlugin(plugin)
   return db.listPlugins()
 })
 ipcMain.handle('vault:status', () => vault.status())

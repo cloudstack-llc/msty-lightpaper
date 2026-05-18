@@ -1,0 +1,1 @@
+{"id":"lightpaper.quick-capture","name":"Quick Capture","version":"0.1.0","description":"Fast inbox capture blocks for turning selection or the current note into an actionable entry.","author":"Msty LightPaper","main":"index.ts","permissions":["commands"],"contributes":{"commands":[{"id":"quickCapture.toInbox","title":"Capture Selection to Inbox","category":"Capture"}]}}

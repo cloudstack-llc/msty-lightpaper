@@ -1,0 +1,124 @@
+{
+  "id": "lightpaper.minimal-workspace",
+  "name": "Minimal Workspace",
+  "version": "0.1.0",
+  "description": "A serious workspace theme sample with layout modes, theme settings, frontmatter helper classes, and a docked companion panel.",
+  "author": "Msty LightPaper",
+  "main": "index.ts",
+  "permissions": ["commands", "settings", "ui"],
+  "contributes": {
+    "commands": [
+      { "id": "minimal.insertStyleGuide", "title": "Minimal: Insert Style Guide Note", "category": "Themes" },
+      { "id": "minimal.insertCardsDemo", "title": "Minimal: Insert Cards Demo", "category": "Themes" },
+      { "id": "minimal.insertImageGridDemo", "title": "Minimal: Insert Image Grid Demo", "category": "Themes" },
+      { "id": "minimal.activateTheme", "title": "Minimal: Activate Theme", "category": "Themes" },
+      { "id": "minimal.layoutStandard", "title": "Minimal: Standard Layout", "category": "Themes" },
+      { "id": "minimal.layoutFocus", "title": "Minimal: Focus Layout", "category": "Themes" },
+      { "id": "minimal.layoutWide", "title": "Minimal: Wide Layout", "category": "Themes" },
+      { "id": "minimal.layoutCards", "title": "Minimal: Cards Layout", "category": "Themes" },
+      { "id": "minimal.toggleColorfulHeadings", "title": "Minimal: Toggle Colorful Headings", "category": "Themes" },
+      { "id": "minimal.toggleHideBorders", "title": "Minimal: Toggle Workspace Borders", "category": "Themes" }
+    ],
+    "panels": [
+      { "id": "minimal.layout", "title": "Minimal Layout", "location": "right" }
+    ],
+    "themes": [
+      {
+        "id": "minimal-workspace",
+        "label": "Minimal Workspace",
+        "modes": ["dark", "light"],
+        "inspiration": "Obsidian Minimal",
+        "description": "A low-chrome workspace theme with focus modes, wide content helpers, cards, image grids, and per-theme settings.",
+        "cssFile": "minimal-workspace.css",
+        "layoutModes": [
+          { "id": "focus", "label": "Focus", "description": "Suppresses chrome and docks for long-form writing." },
+          { "id": "wide", "label": "Wide", "description": "Expands tables, images, and split work." },
+          { "id": "cards", "label": "Cards", "description": "Optimizes preview spacing for card and gallery notes." }
+        ],
+        "settings": [
+          {
+            "id": "accent",
+            "label": "Accent",
+            "type": "select",
+            "defaultValue": "blue",
+            "dataAttribute": "lp-theme-accent",
+            "options": [
+              { "value": "blue", "label": "Blue" },
+              { "value": "mono", "label": "Mono" },
+              { "value": "green", "label": "Green" },
+              { "value": "orange", "label": "Orange" }
+            ]
+          },
+          {
+            "id": "contrast",
+            "label": "Background contrast",
+            "type": "select",
+            "defaultValue": "low",
+            "dataAttribute": "lp-theme-contrast",
+            "options": [
+              { "value": "low", "label": "Low contrast" },
+              { "value": "high", "label": "High contrast" },
+              { "value": "black", "label": "True black" }
+            ]
+          },
+          {
+            "id": "lineWidth",
+            "label": "Line width",
+            "type": "select",
+            "defaultValue": "68ch",
+            "cssVariable": "--preview-measure",
+            "options": [
+              { "value": "58ch", "label": "Narrow" },
+              { "value": "68ch", "label": "Normal" },
+              { "value": "82ch", "label": "Wide" },
+              { "value": "104ch", "label": "Maximum" }
+            ]
+          },
+          {
+            "id": "density",
+            "label": "Interface density",
+            "type": "select",
+            "defaultValue": "airy",
+            "dataAttribute": "lp-theme-density",
+            "options": [
+              { "value": "airy", "label": "Airy" },
+              { "value": "compact", "label": "Compact" }
+            ]
+          },
+          {
+            "id": "colorfulHeadings",
+            "label": "Colorful headings",
+            "type": "toggle",
+            "defaultValue": false,
+            "dataAttribute": "lp-colorful-headings"
+          },
+          {
+            "id": "hideBorders",
+            "label": "Hide workspace borders",
+            "type": "toggle",
+            "defaultValue": false,
+            "dataAttribute": "lp-hide-borders"
+          }
+        ],
+        "previewClasses": [
+          { "id": "cards", "label": "Cards", "description": "Turns tables into card grids." },
+          { "id": "list-cards", "label": "List cards", "description": "Turns top-level lists into card grids." },
+          { "id": "cards-cover", "label": "Cover images" },
+          { "id": "cards-16-9", "label": "16:9 card media" },
+          { "id": "cards-1-1", "label": "Square card media" },
+          { "id": "cards-cols-2", "label": "Two card columns" },
+          { "id": "cards-cols-3", "label": "Three card columns" },
+          { "id": "img-grid", "label": "Image grid", "description": "Places image-only paragraphs into a grid." },
+          { "id": "img-grid-ratio", "label": "Contain image grid" },
+          { "id": "img-wide", "label": "Wide images" },
+          { "id": "img-max", "label": "Max-width images" },
+          { "id": "table-wide", "label": "Wide tables" },
+          { "id": "table-max", "label": "Max-width tables" },
+          { "id": "table-small", "label": "Small tables" },
+          { "id": "table-lines", "label": "Table cell lines" },
+          { "id": "row-alt", "label": "Alternating table rows" }
+        ]
+      }
+    ]
+  }
+}

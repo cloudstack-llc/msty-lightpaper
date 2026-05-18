@@ -53,5 +53,5 @@ export function MarkdownEditor({ value, onChange, onScroll }: { value: string; o
     if (current !== value) view.dispatch({ changes: { from: 0, to: current.length, insert: value } })
   }, [value])
 
-  return <div className="h-full" ref={host} />
+  return <div data-lp-view="editor" className="h-full" ref={host} />
 }

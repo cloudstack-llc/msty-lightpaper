@@ -1,4 +1,4 @@
-import type { AiActionInput, AiActionOutput, AiProviderConfig, PluginManifest } from './types'
+import type { AiActionInput, AiActionOutput, AiProviderConfig, AppSettings, PluginManifest, ThemeContribution } from './types'
 
 export type LightPaperDisposable = { dispose(): void }
 export type LightPaperDisposableLike = LightPaperDisposable | (() => void)
@@ -10,6 +10,8 @@ export type LightPaperCommandContext = {
   replaceSelection(text: string): Promise<void>
   insertText(text: string): Promise<void>
   showToast(message: string): void
+  getSettings?(): AppSettings
+  updateSettings?(next: Partial<AppSettings>): Promise<void>
 }
 
 export type LightPaperCommandHandler = (ctx: LightPaperCommandContext) => unknown | Promise<unknown>
@@ -58,6 +60,11 @@ export type LightPaperPanelRegistration = {
   pluginName: string
   location: 'left' | 'right' | 'bottom'
   render: () => HTMLElement
+}
+
+export type LightPaperThemeRegistration = ThemeContribution & {
+  pluginId: string
+  pluginName: string
 }
 
 export type LightPaperPluginApi = {

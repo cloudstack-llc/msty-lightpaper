@@ -12,4 +12,9 @@ export async function activate(api: LightPaperPluginApi) {
   api.commands.register('templates.insertBugReport', 'Insert Bug Report', (ctx) => ctx.insertText(templates.bug))
   api.commands.register('templates.insertReleaseNotes', 'Insert Release Notes', (ctx) => ctx.insertText(templates.release))
   api.commands.register('templates.insertProjectBrief', 'Insert Project Brief', (ctx) => ctx.insertText(templates.brief))
+  api.ui.registerPanel('templates.library', 'Templates', () => {
+    const element = document.createElement('div')
+    element.innerHTML = '<div class="lp-plugin-panel"><p class="lp-panel-kicker">Snippet library</p><h3>Templates</h3><p>ADR, bug report, release notes, and project brief commands are available from the command palette.</p></div>'
+    return element
+  })
 }

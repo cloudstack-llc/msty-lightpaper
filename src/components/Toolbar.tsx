@@ -1,15 +1,15 @@
 import { Bot, Command, Eye, GitBranch, PanelLeftClose, Save, Settings, SplitSquareHorizontal, Type, Wand2 } from 'lucide-react'
 import type { EditorMode, ThemeId } from '@shared/types'
+import { themeOptions } from '@/lib/themes'
 import { basename, wordCount } from '@/lib/utils'
 import { useAppStore } from '@/store/app-store'
 
-const themes: ThemeId[] = ['obsidian', 'paper', 'midnight', 'solar', 'forest']
-
 export function Toolbar({ onAi, onPlugins, onCommands, onSettings, onToggleSidebar, sidebarOpen }: { onAi(): void; onPlugins(): void; onCommands(): void; onSettings(): void; onToggleSidebar(): void; sidebarOpen: boolean }) {
-  const { activeFile, content, savedContent, settings, save, updateSettings } = useAppStore()
+  const { activeFile, content, savedContent, settings, save, updateSettings, pluginThemes } = useAppStore()
+  const options = themeOptions(pluginThemes)
   const dirty = content !== savedContent
   const setMode = (editorMode: EditorMode) => updateSettings({ editorMode, ...(editorMode === 'split' ? { splitRatio: 50 } : {}) })
-  return <header className="titlebar-drag flex h-14 shrink-0 items-center justify-between border-b bg-background/72 px-4 backdrop-blur-xl">
+  return <header data-lp-slot="toolbar" className="titlebar-drag flex h-14 shrink-0 items-center justify-between border-b bg-background/72 px-4 backdrop-blur-xl">
     <div className="flex min-w-0 items-center gap-3">
       <button type="button" title={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'} className="titlebar-no-drag rounded-xl border bg-card p-2 shadow-glow hover:bg-muted" onClick={onToggleSidebar}><PanelLeftClose className="h-4 w-4 text-primary" /></button>
       <div className="min-w-0">
@@ -25,7 +25,7 @@ export function Toolbar({ onAi, onPlugins, onCommands, onSettings, onToggleSideb
       </div>
       <label className="flex items-center gap-2 rounded-xl border bg-card px-3 py-2 text-xs text-muted-foreground">
         Theme
-        <select className="bg-transparent text-foreground outline-none" value={settings?.theme ?? 'obsidian'} onChange={(e) => updateSettings({ theme: e.target.value as ThemeId })}>{themes.map((t) => <option key={t} value={t}>{t}</option>)}</select>
+        <select className="bg-transparent text-foreground outline-none" value={settings?.theme ?? 'obsidian'} onChange={(e) => updateSettings({ theme: e.target.value as ThemeId })}>{options.map((theme) => <option key={theme.id} value={theme.id}>{theme.label}</option>)}</select>
       </label>
       <button type="button" className="rounded-xl border bg-card px-3 py-2 text-sm hover:bg-muted" onClick={onAi}><Bot className="mr-1.5 inline h-4 w-4 text-accent" />AI</button>
       <button type="button" className="rounded-xl border bg-card px-3 py-2 text-sm hover:bg-muted" onClick={onCommands}><Command className="mr-1.5 inline h-4 w-4 text-accent" />Commands</button>

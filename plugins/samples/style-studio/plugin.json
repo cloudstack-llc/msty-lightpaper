@@ -1,0 +1,1 @@
+{"id":"lightpaper.style-studio","name":"Style Studio","version":"0.1.0","description":"Theme-token documentation and style-setting notes for tuning LightPaper appearance.","author":"Msty LightPaper","main":"index.ts","permissions":["commands"],"contributes":{"commands":[{"id":"styleStudio.insertTokenGuide","title":"Insert Style Token Guide","category":"Appearance"}]}}

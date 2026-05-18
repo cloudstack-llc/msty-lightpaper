@@ -1,0 +1,1 @@
+{"id":"lightpaper.import-bridge","name":"Import Bridge","version":"0.1.0","description":"Clean imported HTML paste into Markdown headings, lists, and readable plain text.","author":"Msty LightPaper","main":"index.ts","permissions":["commands"],"contributes":{"commands":[{"id":"importBridge.cleanPaste","title":"Clean Imported HTML Paste","category":"Import"}]}}

@@ -16,11 +16,36 @@ export type MarkdownRenderOptions = {
 }
 
 const calloutTypes = new Set(['note', 'tip', 'warning', 'danger', 'ai'])
+const taskStateMap = new Map([
+  ['/', 'incomplete'],
+  ['-', 'canceled'],
+  ['>', 'forwarded'],
+  ['<', 'scheduled'],
+  ['?', 'question'],
+  ['!', 'important'],
+  ['*', 'star'],
+  ['"', 'quote'],
+  ['l', 'location'],
+  ['b', 'bookmark'],
+  ['i', 'information'],
+  ['S', 'savings'],
+  ['I', 'idea'],
+  ['p', 'pros'],
+  ['c', 'cons'],
+  ['f', 'fire'],
+  ['k', 'key'],
+  ['w', 'win'],
+  ['u', 'up'],
+  ['d', 'down'],
+])
 const allowedPreviewClasses = [
   'markdown-link',
   'wiki-link',
   'callout',
   'callout-title',
+  'task-list-item',
+  'contains-task-list',
+  ...Array.from(taskStateMap.values()).map((state) => `task-state-${state}`),
   ...Array.from(calloutTypes).map((type) => `callout-${type}`),
 ]
 
@@ -95,6 +120,31 @@ function rehypeLinkPolicy() {
   }
 }
 
+function remarkAlternateTaskStates() {
+  return (tree: unknown) => {
+    visit(tree, 'listItem', (node: any) => {
+      if (node.checked != null) return
+      const first = node.children?.[0]
+      const firstText = first?.children?.[0]
+      if (first?.type !== 'paragraph' || firstText?.type !== 'text') return
+      const match = String(firstText.value).match(/^\[([/\-><?!*"lbiSpcfkwudI])\]\s+/)
+      if (!match) return
+
+      const state = taskStateMap.get(match[1])
+      if (!state) return
+      firstText.value = String(firstText.value).slice(match[0].length)
+      node.data = {
+        ...node.data,
+        hProperties: {
+          ...(node.data?.hProperties ?? {}),
+          className: ['task-list-item', `task-state-${state}`],
+          dataTaskState: state,
+        },
+      }
+    })
+  }
+}
+
 const lightPaperSanitizeSchema = {
   ...defaultSchema,
   tagNames: [...(defaultSchema.tagNames ?? []), 'aside'],
@@ -108,6 +158,7 @@ const lightPaperSanitizeSchema = {
       ...(defaultSchema.attributes?.['*'] ?? []),
       ['className', ...allowedPreviewClasses],
       ['dataCallout'],
+      ['dataTaskState'],
       ['dataWikiTarget'],
     ],
     a: [
@@ -134,6 +185,7 @@ export function createMarkdownProcessor(options: MarkdownRenderOptions = {}) {
     .use(remarkGfm)
     .use(remarkFrontmatter, ['yaml', 'toml'])
     .use(remarkDirective)
+    .use(remarkAlternateTaskStates)
     .use(remarkLightPaperCallouts)
 
   for (const extension of options.extensions?.filter((item) => item.kind === 'remark') ?? []) {

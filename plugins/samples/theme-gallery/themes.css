@@ -1,0 +1,628 @@
+.theme-quiet-focus {
+  --background: 228 18% 8%;
+  --foreground: 220 18% 91%;
+  --card: 228 15% 11%;
+  --card-foreground: 220 18% 91%;
+  --popover: 228 15% 11%;
+  --popover-foreground: 220 18% 91%;
+  --primary: 250 70% 72%;
+  --primary-foreground: 228 18% 8%;
+  --secondary: 225 12% 17%;
+  --secondary-foreground: 220 18% 91%;
+  --muted: 225 10% 16%;
+  --muted-foreground: 220 9% 64%;
+  --accent: 168 48% 56%;
+  --accent-foreground: 228 18% 8%;
+  --destructive: 354 70% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 225 11% 22%;
+  --input: 225 11% 22%;
+  --ring: 250 70% 72%;
+  --radius: 0.45rem;
+  --preview-measure: 68ch;
+  --preview-leading: 1.82;
+  --theme-editor-font-size: 14px;
+  --theme-editor-padding: 32px 30px 96px;
+}
+
+.theme-soft-things {
+  --background: 43 34% 93%;
+  --foreground: 220 20% 18%;
+  --card: 39 42% 97%;
+  --card-foreground: 220 20% 18%;
+  --popover: 39 42% 97%;
+  --popover-foreground: 220 20% 18%;
+  --primary: 206 70% 46%;
+  --primary-foreground: 39 42% 97%;
+  --secondary: 16 55% 88%;
+  --secondary-foreground: 220 20% 18%;
+  --muted: 42 28% 86%;
+  --muted-foreground: 220 12% 42%;
+  --accent: 12 74% 58%;
+  --accent-foreground: 39 42% 97%;
+  --destructive: 354 68% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 36 24% 78%;
+  --input: 36 24% 78%;
+  --ring: 206 70% 46%;
+  --radius: 0.7rem;
+  --preview-measure: 72ch;
+  --preview-leading: 1.76;
+  --theme-editor-font-size: 15px;
+  --theme-editor-padding: 34px 34px 96px;
+}
+
+.theme-blue-summit {
+  --background: 218 48% 7%;
+  --foreground: 204 36% 94%;
+  --card: 218 42% 10%;
+  --card-foreground: 204 36% 94%;
+  --popover: 218 42% 10%;
+  --popover-foreground: 204 36% 94%;
+  --primary: 199 100% 62%;
+  --primary-foreground: 218 48% 7%;
+  --secondary: 222 35% 17%;
+  --secondary-foreground: 204 36% 94%;
+  --muted: 222 30% 16%;
+  --muted-foreground: 208 18% 66%;
+  --accent: 327 88% 70%;
+  --accent-foreground: 218 48% 7%;
+  --destructive: 2 78% 62%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 220 30% 22%;
+  --input: 220 30% 22%;
+  --ring: 199 100% 62%;
+  --preview-measure: 76ch;
+  --preview-leading: 1.72;
+  --theme-editor-font-size: 14px;
+  --theme-editor-padding: 30px 28px 96px;
+}
+
+.theme-adaptive-rose {
+  --background: 235 24% 9%;
+  --foreground: 36 28% 91%;
+  --card: 236 20% 12%;
+  --card-foreground: 36 28% 91%;
+  --popover: 236 20% 12%;
+  --popover-foreground: 36 28% 91%;
+  --primary: 337 62% 68%;
+  --primary-foreground: 235 24% 9%;
+  --secondary: 265 22% 19%;
+  --secondary-foreground: 36 28% 91%;
+  --muted: 265 16% 18%;
+  --muted-foreground: 37 13% 65%;
+  --accent: 134 40% 62%;
+  --accent-foreground: 235 24% 9%;
+  --destructive: 4 72% 64%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 264 16% 24%;
+  --input: 264 16% 24%;
+  --ring: 337 62% 68%;
+  --radius: 1rem;
+  --preview-measure: 70ch;
+  --preview-leading: 1.8;
+  --theme-editor-font-size: 14.5px;
+  --theme-editor-padding: 32px 32px 96px;
+}
+
+.theme-nord-desk {
+  --background: 220 24% 10%;
+  --foreground: 218 28% 88%;
+  --card: 220 22% 13%;
+  --card-foreground: 218 28% 88%;
+  --popover: 220 22% 13%;
+  --popover-foreground: 218 28% 88%;
+  --primary: 193 43% 67%;
+  --primary-foreground: 220 24% 10%;
+  --secondary: 222 18% 20%;
+  --secondary-foreground: 218 28% 88%;
+  --muted: 222 16% 18%;
+  --muted-foreground: 218 15% 65%;
+  --accent: 92 28% 65%;
+  --accent-foreground: 220 24% 10%;
+  --destructive: 354 42% 56%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 222 16% 25%;
+  --input: 222 16% 25%;
+  --ring: 193 43% 67%;
+  --preview-measure: 74ch;
+  --preview-leading: 1.7;
+  --theme-editor-font-size: 14px;
+  --theme-editor-padding: 28px 28px 92px;
+}
+
+.theme-atom-craft {
+  --background: 224 20% 12%;
+  --foreground: 214 22% 90%;
+  --card: 224 18% 15%;
+  --card-foreground: 214 22% 90%;
+  --popover: 224 18% 15%;
+  --popover-foreground: 214 22% 90%;
+  --primary: 212 92% 67%;
+  --primary-foreground: 224 20% 12%;
+  --secondary: 222 14% 22%;
+  --secondary-foreground: 214 22% 90%;
+  --muted: 222 13% 20%;
+  --muted-foreground: 214 12% 64%;
+  --accent: 36 87% 62%;
+  --accent-foreground: 224 20% 12%;
+  --destructive: 3 75% 61%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 222 13% 27%;
+  --input: 222 13% 27%;
+  --ring: 212 92% 67%;
+  --preview-measure: 78ch;
+  --preview-leading: 1.68;
+  --theme-editor-font-size: 13.5px;
+  --theme-editor-padding: 26px 26px 92px;
+}
+
+.theme-basalt-night {
+  --background: 255 26% 7%;
+  --foreground: 252 22% 91%;
+  --card: 255 23% 10%;
+  --card-foreground: 252 22% 91%;
+  --popover: 255 23% 10%;
+  --popover-foreground: 252 22% 91%;
+  --primary: 274 82% 72%;
+  --primary-foreground: 255 26% 7%;
+  --secondary: 258 20% 17%;
+  --secondary-foreground: 252 22% 91%;
+  --muted: 258 17% 16%;
+  --muted-foreground: 252 13% 64%;
+  --accent: 181 58% 54%;
+  --accent-foreground: 255 26% 7%;
+  --destructive: 350 68% 58%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 258 17% 22%;
+  --input: 258 17% 22%;
+  --ring: 274 82% 72%;
+  --radius: 0.22rem;
+  --preview-measure: 71ch;
+  --preview-leading: 1.74;
+  --theme-editor-font-size: 14px;
+  --theme-editor-padding: 30px 28px 96px;
+}
+
+.theme-amber-signal {
+  --background: 42 28% 10%;
+  --foreground: 48 32% 90%;
+  --card: 43 25% 13%;
+  --card-foreground: 48 32% 90%;
+  --popover: 43 25% 13%;
+  --popover-foreground: 48 32% 90%;
+  --primary: 44 95% 58%;
+  --primary-foreground: 42 28% 10%;
+  --secondary: 34 22% 20%;
+  --secondary-foreground: 48 32% 90%;
+  --muted: 34 18% 18%;
+  --muted-foreground: 47 16% 65%;
+  --accent: 162 55% 51%;
+  --accent-foreground: 42 28% 10%;
+  --destructive: 0 72% 58%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 34 18% 25%;
+  --input: 34 18% 25%;
+  --ring: 44 95% 58%;
+  --radius: 0.38rem;
+  --preview-measure: 73ch;
+  --preview-leading: 1.68;
+  --theme-editor-font-size: 14px;
+  --theme-editor-padding: 26px 26px 90px;
+}
+
+.theme-manuscript {
+  --background: 45 45% 95%;
+  --foreground: 28 20% 15%;
+  --card: 42 58% 98%;
+  --card-foreground: 28 20% 15%;
+  --popover: 42 58% 98%;
+  --popover-foreground: 28 20% 15%;
+  --primary: 213 42% 38%;
+  --primary-foreground: 42 58% 98%;
+  --secondary: 39 30% 88%;
+  --secondary-foreground: 28 20% 15%;
+  --muted: 39 28% 86%;
+  --muted-foreground: 28 12% 42%;
+  --accent: 7 55% 48%;
+  --accent-foreground: 42 58% 98%;
+  --destructive: 0 62% 48%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 36 24% 76%;
+  --input: 36 24% 76%;
+  --ring: 213 42% 38%;
+  --radius: 0.35rem;
+  --preview-font-family: Literata, Georgia, ui-serif, serif;
+  --preview-measure: 62ch;
+  --preview-leading: 1.9;
+  --theme-editor-font-size: 15px;
+  --theme-editor-padding: 42px 40px 110px;
+}
+
+.theme-story-codex {
+  --background: 222 18% 8%;
+  --foreground: 40 36% 92%;
+  --card: 223 16% 11%;
+  --card-foreground: 40 36% 92%;
+  --popover: 223 16% 11%;
+  --popover-foreground: 40 36% 92%;
+  --primary: 28 86% 62%;
+  --primary-foreground: 222 18% 8%;
+  --secondary: 184 18% 18%;
+  --secondary-foreground: 40 36% 92%;
+  --muted: 184 14% 16%;
+  --muted-foreground: 40 14% 66%;
+  --accent: 187 62% 58%;
+  --accent-foreground: 222 18% 8%;
+  --destructive: 354 72% 61%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 184 14% 24%;
+  --input: 184 14% 24%;
+  --ring: 28 86% 62%;
+  --radius: 0.55rem;
+  --preview-font-family: Literata, Georgia, ui-serif, serif;
+  --preview-measure: 66ch;
+  --preview-leading: 1.86;
+  --theme-editor-font-size: 14.5px;
+  --theme-editor-padding: 34px 34px 100px;
+}
+
+:is(
+  .theme-quiet-focus,
+  .theme-soft-things,
+  .theme-blue-summit,
+  .theme-adaptive-rose,
+  .theme-nord-desk,
+  .theme-atom-craft,
+  .theme-basalt-night,
+  .theme-amber-signal,
+  .theme-manuscript,
+  .theme-story-codex
+) body {
+  background:
+    radial-gradient(circle at 20% 0%, hsl(var(--primary) / 0.12), transparent 32rem),
+    linear-gradient(180deg, hsl(var(--background)), hsl(var(--background)));
+}
+
+:is(
+  .theme-quiet-focus,
+  .theme-soft-things,
+  .theme-blue-summit,
+  .theme-adaptive-rose,
+  .theme-nord-desk,
+  .theme-atom-craft,
+  .theme-basalt-night,
+  .theme-amber-signal,
+  .theme-manuscript,
+  .theme-story-codex
+) .cm-editor {
+  font-size: var(--theme-editor-font-size, 14px);
+}
+
+:is(
+  .theme-quiet-focus,
+  .theme-soft-things,
+  .theme-blue-summit,
+  .theme-adaptive-rose,
+  .theme-nord-desk,
+  .theme-atom-craft,
+  .theme-basalt-night,
+  .theme-amber-signal,
+  .theme-manuscript,
+  .theme-story-codex
+) .cm-scroller {
+  padding: var(--theme-editor-padding, 28px 24px 80px);
+}
+
+:is(
+  .theme-quiet-focus,
+  .theme-soft-things,
+  .theme-blue-summit,
+  .theme-adaptive-rose,
+  .theme-nord-desk,
+  .theme-atom-craft,
+  .theme-basalt-night,
+  .theme-amber-signal,
+  .theme-manuscript,
+  .theme-story-codex
+) .cm-line {
+  padding-block: 0.08rem;
+}
+
+:is(
+  .theme-quiet-focus,
+  .theme-soft-things,
+  .theme-blue-summit,
+  .theme-adaptive-rose,
+  .theme-nord-desk,
+  .theme-atom-craft,
+  .theme-basalt-night,
+  .theme-amber-signal,
+  .theme-manuscript,
+  .theme-story-codex
+) .cm-gutters {
+  background: hsl(var(--card) / 0.64) !important;
+}
+
+:is(
+  .theme-quiet-focus,
+  .theme-soft-things,
+  .theme-blue-summit,
+  .theme-adaptive-rose,
+  .theme-nord-desk,
+  .theme-atom-craft,
+  .theme-basalt-night,
+  .theme-amber-signal,
+  .theme-manuscript,
+  .theme-story-codex
+) .prose-lightpaper h1 {
+  color: hsl(var(--foreground));
+  font-weight: 850;
+  text-wrap: balance;
+}
+
+:is(
+  .theme-quiet-focus,
+  .theme-soft-things,
+  .theme-blue-summit,
+  .theme-adaptive-rose,
+  .theme-nord-desk,
+  .theme-atom-craft,
+  .theme-basalt-night,
+  .theme-amber-signal,
+  .theme-manuscript,
+  .theme-story-codex
+) .prose-lightpaper h2 {
+  color: hsl(var(--primary));
+  text-wrap: pretty;
+}
+
+:is(
+  .theme-quiet-focus,
+  .theme-soft-things,
+  .theme-blue-summit,
+  .theme-adaptive-rose,
+  .theme-nord-desk,
+  .theme-atom-craft,
+  .theme-basalt-night,
+  .theme-amber-signal,
+  .theme-manuscript,
+  .theme-story-codex
+) .prose-lightpaper pre {
+  background: hsl(var(--card) / 0.92);
+  box-shadow: inset 0 1px 0 hsl(var(--foreground) / 0.04);
+}
+
+:is(
+  .theme-quiet-focus,
+  .theme-soft-things,
+  .theme-blue-summit,
+  .theme-adaptive-rose,
+  .theme-nord-desk,
+  .theme-atom-craft,
+  .theme-basalt-night,
+  .theme-amber-signal,
+  .theme-manuscript,
+  .theme-story-codex
+) .prose-lightpaper table {
+  overflow: hidden;
+  border-radius: var(--radius);
+}
+
+.theme-quiet-focus .prose-lightpaper h1 {
+  border-bottom: 1px solid hsl(var(--border));
+  padding-bottom: 0.55rem;
+}
+
+.theme-quiet-focus .prose-lightpaper blockquote {
+  border-left-color: hsl(var(--accent));
+  background: hsl(var(--card) / 0.72);
+}
+
+.theme-quiet-focus .cm-activeLine,
+.theme-quiet-focus .cm-activeLineGutter {
+  background: hsl(var(--primary) / 0.08) !important;
+}
+
+.theme-soft-things body {
+  background:
+    radial-gradient(circle at 10% 10%, hsl(var(--accent) / 0.16), transparent 22rem),
+    radial-gradient(circle at 90% 0%, hsl(var(--primary) / 0.12), transparent 20rem),
+    hsl(var(--background));
+}
+
+.theme-soft-things .prose-lightpaper h1 {
+  color: hsl(var(--primary));
+}
+
+.theme-soft-things .prose-lightpaper h2 {
+  border-bottom: 2px dashed hsl(var(--secondary));
+  padding-bottom: 0.42rem;
+}
+
+.theme-soft-things .prose-lightpaper blockquote,
+.theme-soft-things .prose-lightpaper .callout {
+  border-left-width: 0;
+  border-radius: 1.1rem;
+  box-shadow: 0 12px 40px hsl(28 40% 48% / 0.12);
+}
+
+.theme-soft-things .cm-editor {
+  background: hsl(var(--card) / 0.35);
+}
+
+.theme-blue-summit .prose-lightpaper h1 {
+  color: hsl(var(--primary));
+  font-size: clamp(2.3rem, 4vw, 3.35rem);
+}
+
+.theme-blue-summit .prose-lightpaper h2 {
+  color: hsl(var(--accent));
+}
+
+.theme-blue-summit .prose-lightpaper blockquote {
+  background: linear-gradient(90deg, hsl(var(--primary) / 0.14), hsl(var(--accent) / 0.08));
+  border-left-color: hsl(var(--primary));
+}
+
+.theme-blue-summit .cm-gutters {
+  border-right-color: hsl(var(--primary) / 0.28) !important;
+}
+
+.theme-adaptive-rose .prose-lightpaper h1 {
+  color: hsl(var(--primary));
+  font-family: Literata, Georgia, ui-serif, serif;
+}
+
+.theme-adaptive-rose .prose-lightpaper h2::before {
+  color: hsl(var(--accent));
+  content: "# ";
+}
+
+.theme-adaptive-rose .prose-lightpaper .callout {
+  border-radius: 1.15rem;
+  background: linear-gradient(135deg, hsl(var(--primary) / 0.14), hsl(var(--accent) / 0.07));
+}
+
+.theme-adaptive-rose .cm-selectionBackground {
+  background: hsl(var(--primary) / 0.34) !important;
+}
+
+.theme-nord-desk .prose-lightpaper h1,
+.theme-nord-desk .prose-lightpaper h2 {
+  letter-spacing: 0.01em;
+}
+
+.theme-nord-desk .prose-lightpaper pre,
+.theme-nord-desk .prose-lightpaper code {
+  background: hsl(220 28% 8%);
+}
+
+.theme-nord-desk .prose-lightpaper blockquote {
+  border-left-color: hsl(var(--accent));
+  background: hsl(var(--secondary) / 0.54);
+}
+
+.theme-atom-craft .cm-editor,
+.theme-atom-craft .prose-lightpaper code,
+.theme-atom-craft .prose-lightpaper pre {
+  font-family: JetBrainsMono, SFMono-Regular, ui-monospace, monospace;
+}
+
+.theme-atom-craft .prose-lightpaper h1,
+.theme-atom-craft .prose-lightpaper h2 {
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.45rem;
+  background: hsl(var(--card) / 0.58);
+  padding: 0.55rem 0.7rem;
+}
+
+.theme-atom-craft .cm-activeLine {
+  box-shadow: inset 3px 0 0 hsl(var(--primary));
+}
+
+.theme-basalt-night .prose-lightpaper h1 {
+  text-transform: uppercase;
+}
+
+.theme-basalt-night .prose-lightpaper h2 {
+  border-left: 5px solid hsl(var(--primary));
+  padding-left: 0.75rem;
+}
+
+.theme-basalt-night .prose-lightpaper blockquote,
+.theme-basalt-night .prose-lightpaper pre {
+  border-width: 2px;
+  border-radius: 0.15rem;
+}
+
+.theme-basalt-night .cm-gutters {
+  box-shadow: inset -2px 0 0 hsl(var(--primary) / 0.34);
+}
+
+.theme-amber-signal body {
+  background:
+    linear-gradient(hsl(var(--primary) / 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--primary) / 0.04) 1px, transparent 1px),
+    hsl(var(--background));
+  background-size: 28px 28px;
+}
+
+.theme-amber-signal .prose-lightpaper h1,
+.theme-amber-signal .prose-lightpaper h2 {
+  font-family: JetBrainsMono, SFMono-Regular, ui-monospace, monospace;
+}
+
+.theme-amber-signal .prose-lightpaper h2 {
+  border-bottom: 1px solid hsl(var(--primary) / 0.42);
+  padding-bottom: 0.35rem;
+}
+
+.theme-amber-signal .prose-lightpaper blockquote {
+  background: hsl(var(--primary) / 0.08);
+  border-left-color: hsl(var(--primary));
+}
+
+.theme-amber-signal .cm-cursor {
+  border-left-width: 2px !important;
+}
+
+.theme-manuscript body {
+  background:
+    linear-gradient(90deg, hsl(var(--border) / 0.24) 1px, transparent 1px),
+    hsl(var(--background));
+  background-size: 44px 44px;
+}
+
+.theme-manuscript .prose-lightpaper {
+  font-size: 1.04rem;
+}
+
+.theme-manuscript .prose-lightpaper h1,
+.theme-manuscript .prose-lightpaper h2,
+.theme-manuscript .prose-lightpaper h3 {
+  font-family: Literata, Georgia, ui-serif, serif;
+  font-weight: 760;
+}
+
+.theme-manuscript .prose-lightpaper h2 {
+  color: hsl(var(--foreground));
+  font-style: italic;
+}
+
+.theme-manuscript .prose-lightpaper blockquote {
+  background: transparent;
+  border-left-color: hsl(var(--accent));
+  font-style: italic;
+}
+
+.theme-manuscript .cm-editor {
+  font-family: Literata, Georgia, ui-serif, serif;
+}
+
+.theme-story-codex .prose-lightpaper {
+  font-size: 1.02rem;
+}
+
+.theme-story-codex .prose-lightpaper h1 {
+  color: hsl(var(--primary));
+  font-family: Literata, Georgia, ui-serif, serif;
+}
+
+.theme-story-codex .prose-lightpaper h2 {
+  color: hsl(var(--foreground));
+}
+
+.theme-story-codex .prose-lightpaper h2::after {
+  display: block;
+  width: 4.5rem;
+  height: 2px;
+  margin-top: 0.4rem;
+  background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)));
+  content: "";
+}
+
+.theme-story-codex .prose-lightpaper blockquote,
+.theme-story-codex .prose-lightpaper .callout {
+  background: linear-gradient(135deg, hsl(var(--primary) / 0.11), hsl(var(--accent) / 0.07));
+}

@@ -44,4 +44,9 @@ export async function activate(api: LightPaperPluginApi) {
   api.commands.register('links.extractWikiLinks', 'Extract Wiki Links', async (ctx) => { const links = extractWikiLinks(ctx.documentText || ''); if (ctx.activeFile) await api.metadata.set(ctx.activeFile, 'wikilinks', links); ctx.showToast(links.length ? links.map((link) => `[[${link.target}]]`).join(', ') : 'No wiki links found') })
   api.commands.register('links.insertWikiLink', 'Insert Wiki Link', async (ctx) => ctx.insertText(`[[${(ctx.selectedText || 'New Note').trim()}]]`))
   api.markdown.registerRemarkPlugin('wikilinks', remarkWikiLinks)
+  api.ui.registerPanel('links.backlinks', 'Backlinks', () => {
+    const element = document.createElement('div')
+    element.innerHTML = '<div class="lp-plugin-panel"><p class="lp-panel-kicker">Knowledge graph</p><h3>Backlinks</h3><p>Run "Extract Wiki Links" to store link metadata for this note. Future disk plugins can hydrate this panel from the plugin metadata namespace.</p></div>'
+    return element
+  })
 }

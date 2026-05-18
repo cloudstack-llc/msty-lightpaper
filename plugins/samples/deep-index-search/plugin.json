@@ -1,0 +1,1 @@
+{"id":"lightpaper.deep-index-search","name":"Deep Index Search","version":"0.1.0","description":"Omni-search inspired document indexes for headings, tags, links, and note navigation.","author":"Msty LightPaper","main":"index.ts","permissions":["commands"],"contributes":{"commands":[{"id":"deepIndex.insertSearchIndex","title":"Insert Deep Search Index","category":"Search"}]}}

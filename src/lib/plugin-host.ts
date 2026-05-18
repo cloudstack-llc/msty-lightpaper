@@ -10,6 +10,7 @@ import type {
   LightPaperPanelRegistration,
   LightPaperPluginApi,
   LightPaperPluginModule,
+  LightPaperThemeRegistration,
 } from '@shared/plugin-api'
 import { describePlugin, validatePluginManifest } from './plugin-manifest'
 
@@ -81,6 +82,7 @@ export class PluginHost {
   private aiProviders: LightPaperAiProviderRegistration[] = []
   private markdownExtensions: LightPaperMarkdownExtension[] = []
   private panels: LightPaperPanelRegistration[] = []
+  private themes: LightPaperThemeRegistration[] = []
   private activationErrors: PluginActivationError[] = []
 
   constructor(options: PluginHostOptions) {
@@ -118,6 +120,7 @@ export class PluginHost {
     this.aiProviders = []
     this.markdownExtensions = []
     this.panels = []
+    this.themes = []
 
     for (const module of modulesToDeactivate) {
       await module.deactivate?.()
@@ -180,6 +183,10 @@ export class PluginHost {
     return this.panels.filter((panel) => !location || panel.location === location)
   }
 
+  listThemes() {
+    return [...this.themes].sort((a, b) => a.label.localeCompare(b.label))
+  }
+
   private async activatePlugin(plugin: PluginRecord) {
     const validation = validatePluginManifest(plugin)
     if (!validation.ok) {
@@ -196,6 +203,7 @@ export class PluginHost {
 
     try {
       await module.activate(this.createApi(plugin))
+      this.registerThemeContributions(plugin)
       this.activePluginIds.add(plugin.id)
     } catch (error) {
       this.removePluginContributions(plugin.id)
@@ -305,6 +313,7 @@ export class PluginHost {
     this.aiProviders = this.aiProviders.filter((provider) => provider.pluginId !== pluginId)
     this.markdownExtensions = this.markdownExtensions.filter((extension) => extension.pluginId !== pluginId)
     this.panels = this.panels.filter((panel) => panel.pluginId !== pluginId)
+    this.themes = this.themes.filter((theme) => theme.pluginId !== pluginId)
     this.activePluginIds.delete(pluginId)
   }
 
@@ -320,6 +329,13 @@ export class PluginHost {
       pluginId: plugin.id,
       pluginName: plugin.name,
       models: provider.models.map((model) => ({ ...model, providerId: provider.id })),
+    }
+  }
+
+  private registerThemeContributions(plugin: PluginRecord) {
+    for (const theme of plugin.contributes?.themes ?? []) {
+      this.ensureUnique(this.themes, theme.id, 'theme')
+      this.themes.push({ ...theme, pluginId: plugin.id, pluginName: plugin.name })
     }
   }
 }

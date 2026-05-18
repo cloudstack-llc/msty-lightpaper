@@ -57,6 +57,10 @@ export function listPluginPanels() {
   return bundledPluginHost.listPanels()
 }
 
+export function listPluginThemes() {
+  return bundledPluginHost.listThemes()
+}
+
 export function listPluginActivationErrors() {
   return bundledPluginHost.errors
 }
@@ -64,3 +68,5 @@ export function listPluginActivationErrors() {
 export type RegisteredCommand = ReturnType<typeof listPluginCommands>[number]
 export type RegisteredAiPreset = ReturnType<typeof listPluginAiPresets>[number]
 export type RegisteredAiProvider = ReturnType<typeof listPluginAiProviders>[number]
+export type RegisteredPanel = ReturnType<typeof listPluginPanels>[number]
+export type RegisteredTheme = ReturnType<typeof listPluginThemes>[number]

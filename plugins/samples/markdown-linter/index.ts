@@ -31,4 +31,9 @@ export function fixWhitespace(text: string) { return text.split('\n').map((line)
 export async function activate(api: LightPaperPluginApi) {
   api.commands.register('lint.currentDocument', 'Lint Current Markdown Document', (ctx) => ctx.showToast(formatIssues(lintMarkdown(ctx.documentText || ''))))
   api.commands.register('lint.fixWhitespace', 'Fix Markdown Whitespace', async (ctx) => { await ctx.replaceSelection(fixWhitespace(ctx.documentText || '')); ctx.showToast('Whitespace fixed') })
+  api.ui.registerPanel('lint.diagnostics', 'Markdown Diagnostics', () => {
+    const element = document.createElement('div')
+    element.innerHTML = '<div class="lp-plugin-panel"><p class="lp-panel-kicker">Lint surface</p><h3>Diagnostics</h3><p>Use commands to run deterministic Markdown checks. Panel docking proves UI plugins can join the workspace layout.</p></div>'
+    return element
+  })
 }
