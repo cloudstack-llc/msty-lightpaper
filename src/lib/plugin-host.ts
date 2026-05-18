@@ -91,6 +91,10 @@ export class PluginHost {
     this.onError = options.onError
   }
 
+  setModules(modules: Record<string, LightPaperPluginModule>) {
+    this.modules = modules
+  }
+
   get errors() {
     return [...this.activationErrors]
   }

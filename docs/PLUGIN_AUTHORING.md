@@ -9,12 +9,24 @@ A plugin package should contain:
 ```text
 plugins/samples/my-plugin/
   plugin.json
-  index.ts
+  main.js
   README.md
   index.test.ts
 ```
 
-Bundled samples are added to [bundled-plugins.ts](/Users/ashokgelal/Projects/lightpaper/electron/bundled-plugins.ts) and [bundled-plugin-modules.ts](/Users/ashokgelal/Projects/lightpaper/src/lib/bundled-plugin-modules.ts). External disk loading is intentionally left behind this seam so the host can stay testable.
+Bundled samples are added to [bundled-plugins.ts](/Users/ashokgelal/Projects/lightpaper/electron/bundled-plugins.ts) and [bundled-plugin-modules.ts](/Users/ashokgelal/Projects/lightpaper/src/lib/bundled-plugin-modules.ts). Local disk plugins are installed from a folder and compiled from their declared JavaScript entrypoint at runtime.
+
+Installed local plugins use the same manifest contract, but their runtime entrypoint must be a plain JavaScript CommonJS-style file. The renderer does not expose `require` or Node APIs to plugin code.
+
+```js
+exports.activate = function activate(api) {
+  api.commands.register('myPlugin.insert', 'Insert Template', function(ctx) {
+    return ctx.insertText('\n## Template\n\n')
+  })
+}
+```
+
+Users can install a local plugin folder from the Plugins panel. LightPaper reads `plugin.json`, validates the manifest, stores the folder path, and loads `main.js` plus declared theme CSS assets from disk when the plugin is enabled.
 
 ## Manifest
 
@@ -27,7 +39,7 @@ Use a stable reverse-DNS-style id and declare only the capabilities your plugin 
   "version": "0.1.0",
   "description": "Adds a focused Markdown workflow.",
   "author": "You",
-  "main": "index.ts",
+  "main": "main.js",
   "permissions": ["commands", "markdown", "metadata", "settings"],
   "contributes": {
     "commands": [

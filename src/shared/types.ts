@@ -70,7 +70,9 @@ export type ThemeContribution = {
   settings?: ThemeSettingContribution[]
   previewClasses?: ThemePreviewClassContribution[]
 }
-export type PluginRecord = PluginManifest & { enabled: boolean; installedPath?: string; builtin?: boolean; sample?: boolean }
+export type PluginThemeCssAsset = { key: string; pluginId: string; cssFile: string; css: string }
+export type ExternalPluginBundle = { pluginId: string; mainPath?: string; mainCode?: string; cssAssets?: PluginThemeCssAsset[]; error?: string }
+export type PluginRecord = PluginManifest & { enabled: boolean; installedPath?: string; builtin?: boolean; sample?: boolean; external?: boolean }
 export type AppSettings = {
   theme: ThemeId
   editorMode: EditorMode

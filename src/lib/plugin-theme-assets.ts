@@ -1,13 +1,7 @@
+import type { PluginThemeCssAsset } from '@shared/types'
 import type { LightPaperThemeRegistration } from '@shared/plugin-api'
 import minimalWorkspaceCss from '../../plugins/samples/minimal-workspace/minimal-workspace.css?inline'
 import themeGalleryCss from '../../plugins/samples/theme-gallery/themes.css?inline'
-
-export type PluginThemeCssAsset = {
-  key: string
-  pluginId: string
-  cssFile: string
-  css: string
-}
 
 const bundledThemeCss = new Map<string, string>([
   ['lightpaper.minimal-workspace:minimal-workspace.css', minimalWorkspaceCss],
@@ -22,9 +16,10 @@ export function listBundledThemeCssAssetKeys() {
   return [...bundledThemeCss.keys()].sort()
 }
 
-export function cssAssetsForThemes(themes: LightPaperThemeRegistration[]): PluginThemeCssAsset[] {
+export function cssAssetsForThemes(themes: LightPaperThemeRegistration[], externalAssets: PluginThemeCssAsset[] = []): PluginThemeCssAsset[] {
   const seen = new Set<string>()
   const assets: PluginThemeCssAsset[] = []
+  const externalThemeCss = new Map(externalAssets.map((asset) => [asset.key, asset.css]))
 
   for (const theme of themes) {
     if (!theme.cssFile) continue
@@ -32,7 +27,7 @@ export function cssAssetsForThemes(themes: LightPaperThemeRegistration[]): Plugi
     if (seen.has(key)) continue
     seen.add(key)
 
-    const css = bundledThemeCss.get(key)
+    const css = bundledThemeCss.get(key) ?? externalThemeCss.get(key)
     if (css) assets.push({ key, pluginId: theme.pluginId, cssFile: theme.cssFile, css })
   }
 

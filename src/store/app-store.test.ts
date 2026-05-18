@@ -29,7 +29,9 @@ function bridge(overrides: Partial<Window['lightpaper']> = {}) {
     setSettings: vi.fn().mockResolvedValue(settings),
     listPlugins: vi.fn().mockResolvedValue([]),
     listSamplePlugins: vi.fn().mockResolvedValue(samplePlugins),
+    listExternalPluginBundles: vi.fn().mockResolvedValue([]),
     installSamplePlugin: vi.fn(),
+    installLocalPlugin: vi.fn(),
     uninstallPlugin: vi.fn(),
     seedPlugins: vi.fn().mockResolvedValue([]),
     setPluginEnabled: vi.fn(),
@@ -63,6 +65,7 @@ beforeEach(() => {
     pluginAiProviders: [],
     pluginPanels: [],
     pluginThemes: [],
+    pluginThemeCssAssets: [],
     loading: false,
     lastError: undefined,
     lastAction: undefined,
@@ -91,6 +94,31 @@ describe('useAppStore plugin integration', () => {
 
     expect(useAppStore.getState().content).toContain('## Plan')
     expect(useAppStore.getState().lastAction).toBe('Ran Insert Today Template')
+  })
+
+  it('activates enabled local plugin bundles through the same host runtime', async () => {
+    const localPlugin = {
+      id: 'local.example',
+      name: 'Local Example',
+      version: '0.1.0',
+      description: 'Local plugin',
+      main: 'main.js',
+      permissions: ['commands'],
+      contributes: { commands: [{ id: 'local.hello', title: 'Local Hello' }] },
+      enabled: true,
+      external: true,
+      installedPath: '/plugins/local-example',
+    } as const
+    window.lightpaper = bridge({
+      seedPlugins: vi.fn().mockResolvedValue([localPlugin]),
+      listExternalPluginBundles: vi.fn().mockResolvedValue([{ pluginId: 'local.example', mainCode: 'exports.activate = function(api) { api.commands.register("local.hello", "Local Hello", function(ctx) { return ctx.insertText(" local") }) }' }]),
+    })
+
+    await useAppStore.getState().hydrate()
+    useAppStore.setState({ activeFile: '/notes/local.md', content: 'hello', savedContent: 'hello' })
+    await useAppStore.getState().executePluginCommand('local.hello')
+
+    expect(useAppStore.getState().content).toBe('hello local')
   })
 
   it('lets permitted plugin commands update app settings', async () => {

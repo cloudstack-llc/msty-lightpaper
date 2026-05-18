@@ -19,10 +19,10 @@ React renderer
   - editor shell
   - CodeMirror editor
   - unified Markdown preview
-  - plugin host and plugin-contributed commands, AI presets, model providers, panels, Markdown hooks
+  - plugin host and plugin-contributed commands, AI presets, model providers, panels, themes, Markdown hooks
 ```
 
-The renderer owns plugin activation for bundled/sample plugins. Electron persists plugin records and protects local file boundaries, but plugin modules are regular TypeScript modules that can be tested without Electron.
+The renderer owns plugin activation for bundled/sample plugins and installed local plugins. Electron persists plugin records, validates local plugin folders, reads installed plugin JavaScript/CSS assets from disk, and protects local file boundaries. Bundled plugin modules are regular TypeScript modules; local plugin modules are CommonJS-style JavaScript entrypoints compiled by the renderer without Node APIs.
 
 ## Plugin Host
 
@@ -37,6 +37,11 @@ The host lives in [plugin-host.ts](/Users/ashokgelal/Projects/lightpaper/src/lib
 
 The renderer singleton in [plugin-runtime.ts](/Users/ashokgelal/Projects/lightpaper/src/lib/plugin-runtime.ts) wraps the host for the app store. Tests can instantiate `PluginHost` directly and inject fake modules or fake metadata stores.
 
+Local plugin loading has two pure seams:
+
+- [local-plugin-loader.ts](/Users/ashokgelal/Projects/lightpaper/electron/local-plugin-loader.ts) validates and reads `plugin.json`, `main.js`, and declared theme CSS files from an installed folder.
+- [external-plugin-loader.ts](/Users/ashokgelal/Projects/lightpaper/src/lib/external-plugin-loader.ts) compiles the disk JavaScript bundle into the same `LightPaperPluginModule` contract used by bundled plugins.
+
 ## Manifest Contract
 
 Every plugin is manifest-first:
@@ -47,7 +52,7 @@ Every plugin is manifest-first:
   "name": "Example",
   "version": "1.0.0",
   "description": "Adds example Markdown workflows.",
-  "main": "index.ts",
+  "main": "main.js",
   "permissions": ["commands", "markdown", "ai"],
   "contributes": {
     "commands": [
@@ -168,11 +173,11 @@ The UI is styled by stable tokens in [globals.css](/Users/ashokgelal/Projects/li
 - Frontmatter-driven helper classes on preview roots: `cards`, `list-cards`, `cards-cols-*`, `cards-cover`, `cards-16-9`, `img-grid`, `table-wide`, `table-max`, `table-small`, `row-alt`, and related table/image/iframe helpers.
 - Workspace slot attributes: `data-lp-slot="toolbar"`, `sidebar`, `editor-stage`, `right-dock`, and `bottom-dock`.
 
-Enabled plugins can contribute theme records through `contributes.themes`. Theme records may name a relative `cssFile`; [plugin-theme-assets.ts](/Users/ashokgelal/Projects/lightpaper/src/lib/plugin-theme-assets.ts) resolves those records through an explicit bundled-asset allowlist, and [PluginThemeStyles.tsx](/Users/ashokgelal/Projects/lightpaper/src/components/PluginThemeStyles.tsx) mounts the CSS only while the contributing plugin is enabled.
+Enabled plugins can contribute theme records through `contributes.themes`. Theme records may name a relative `cssFile`; [plugin-theme-assets.ts](/Users/ashokgelal/Projects/lightpaper/src/lib/plugin-theme-assets.ts) resolves bundled sample CSS from an explicit asset allowlist and resolves installed local plugin CSS from the Electron-provided runtime bundle. [PluginThemeStyles.tsx](/Users/ashokgelal/Projects/lightpaper/src/components/PluginThemeStyles.tsx) mounts the CSS only while the contributing plugin is enabled.
 
 Plugin theme CSS must scope itself to `.theme-<id>` because the app applies that class to `<html>`. Themes can also declare `layoutModes`, `settings`, and `previewClasses`; settings can write CSS variables or `data-*` attributes onto `<html>`, and layout modes are exposed through `data-lp-layout`. The [Minimal Workspace sample](/Users/ashokgelal/Projects/lightpaper/plugins/samples/minimal-workspace) uses those hooks to style app chrome, focus/wide/card layout modes, plugin docks, editor spacing, frontmatter classes, tables, list cards, image grids, image filters, and alternate checkboxes. It also declares `settings` so its commands can activate the theme, change layout mode, and toggle theme flags.
 
-Arbitrary external CSS loading is still blocked until disk-loaded plugins have a reviewed asset boundary.
+Local plugin CSS is loaded only from CSS files declared in the validated manifest and resolved inside the installed plugin folder.
 
 ## Testing Strategy
 
@@ -188,6 +193,6 @@ Current coverage focuses on the architecture boundaries:
 - Plugin host contract tests: activation, cleanup, permissions, duplicate ids, metadata isolation, Markdown extension registration, and model-provider registration.
 - Markdown pipeline tests: GFM, callouts, sanitization, external link policy, plugin remark extensions.
 - Sample plugin tests: every sample manifest validates, every sample activates, and pure helper behavior is deterministic.
-- Store integration tests: hydration registers plugin commands and AI presets, commands mutate documents, plugin AI presets take priority over the Electron fallback, and selected model config reaches AI actions.
+- Store integration tests: hydration registers plugin commands and AI presets, local plugin bundles activate through the same runtime, commands mutate documents, plugin AI presets take priority over the Electron fallback, and selected model config reaches AI actions.
 
 New plugins should add pure helper tests and at least one host activation test.

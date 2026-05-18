@@ -1,6 +1,6 @@
 import { create } from 'zustand'
-import { ensureBundledPluginsActivated, getPluginAiModel, getPluginAiPreset, getPluginCommand, listPluginAiPresets, listPluginAiProviders, listPluginCommands, listPluginPanels, listPluginThemes, runPluginAiPreset, type RegisteredAiPreset, type RegisteredAiProvider, type RegisteredCommand, type RegisteredPanel, type RegisteredTheme } from '@/lib/plugin-runtime'
-import type { AiActionInput, AiActionOutput, AppSettings, FileNode, PluginRecord, Workspace } from '@shared/types'
+import { ensureBundledPluginsActivated, getPluginAiModel, getPluginAiPreset, getPluginCommand, listExternalThemeCssAssets, listPluginAiPresets, listPluginAiProviders, listPluginCommands, listPluginPanels, listPluginThemes, runPluginAiPreset, type RegisteredAiPreset, type RegisteredAiProvider, type RegisteredCommand, type RegisteredPanel, type RegisteredTheme } from '@/lib/plugin-runtime'
+import type { AiActionInput, AiActionOutput, AppSettings, ExternalPluginBundle, FileNode, PluginRecord, PluginThemeCssAsset, Workspace } from '@shared/types'
 
 type WorkspaceTree = { workspace: Workspace; tree: FileNode[]; loading?: boolean; error?: string }
 
@@ -19,6 +19,7 @@ type State = {
   pluginAiProviders: RegisteredAiProvider[]
   pluginPanels: RegisteredPanel[]
   pluginThemes: RegisteredTheme[]
+  pluginThemeCssAssets: PluginThemeCssAsset[]
   loading: boolean
   lastError?: string
   lastAction?: string
@@ -39,6 +40,7 @@ type State = {
   runAiAction(input: AiActionInput): Promise<AiActionOutput>
   setPluginEnabled(id: string, enabled: boolean): Promise<void>
   installSamplePlugin(id: string): Promise<void>
+  installLocalPlugin(pluginPath?: string): Promise<void>
   uninstallPlugin(id: string): Promise<void>
 }
 
@@ -64,6 +66,22 @@ function errorMessage(error: unknown) {
 
 function basename(filePath: string) {
   return filePath.split('/').pop() ?? filePath
+}
+
+async function activateRuntimePlugins(plugins: PluginRecord[]) {
+  const externalBundles = await window.lightpaper.listExternalPluginBundles() as ExternalPluginBundle[]
+  await ensureBundledPluginsActivated(plugins, externalBundles)
+}
+
+function pluginRuntimeState() {
+  return {
+    pluginCommands: listPluginCommands(),
+    pluginAiPresets: listPluginAiPresets(),
+    pluginAiProviders: listPluginAiProviders(),
+    pluginPanels: listPluginPanels(),
+    pluginThemes: listPluginThemes(),
+    pluginThemeCssAssets: listExternalThemeCssAssets(),
+  }
 }
 
 function relativePath(root: string, target: string) {
@@ -124,6 +142,7 @@ export const useAppStore = create<State>((set, get) => ({
   pluginAiProviders: [],
   pluginPanels: [],
   pluginThemes: [],
+  pluginThemeCssAssets: [],
   loading: false,
   setActiveFile: (path) => set({ activeFile: path }),
   setContent: (content) => set({ content }),
@@ -135,17 +154,13 @@ export const useAppStore = create<State>((set, get) => ({
       window.lightpaper.seedPlugins(),
       window.lightpaper.listSamplePlugins(),
     ]) as [Workspace[], AppSettings, PluginRecord[], PluginRecord[]]
-    await ensureBundledPluginsActivated(plugins)
+    await activateRuntimePlugins(plugins)
     set({
       workspaces,
       settings,
       plugins,
       samplePlugins,
-      pluginCommands: listPluginCommands(),
-      pluginAiPresets: listPluginAiPresets(),
-      pluginAiProviders: listPluginAiProviders(),
-      pluginPanels: listPluginPanels(),
-      pluginThemes: listPluginThemes(),
+      ...pluginRuntimeState(),
       activeWorkspace: workspaces[0],
       workspaceTrees: workspaces.map((workspace) => ({ workspace, tree: [], loading: true })),
       loading: false,
@@ -273,24 +288,34 @@ export const useAppStore = create<State>((set, get) => ({
   },
   seedPlugins: async () => {
     const [plugins, samplePlugins] = await Promise.all([window.lightpaper.seedPlugins(), window.lightpaper.listSamplePlugins()]) as [PluginRecord[], PluginRecord[]]
-    await ensureBundledPluginsActivated(plugins)
-    set({ plugins, samplePlugins, pluginCommands: listPluginCommands(), pluginAiPresets: listPluginAiPresets(), pluginAiProviders: listPluginAiProviders(), pluginPanels: listPluginPanels(), pluginThemes: listPluginThemes() })
+    await activateRuntimePlugins(plugins)
+    set({ plugins, samplePlugins, ...pluginRuntimeState() })
   },
   setPluginEnabled: async (id, enabled) => {
     const plugins = await window.lightpaper.setPluginEnabled(id, enabled) as PluginRecord[]
-    await ensureBundledPluginsActivated(plugins)
-    set({ plugins, pluginCommands: listPluginCommands(), pluginAiPresets: listPluginAiPresets(), pluginAiProviders: listPluginAiProviders(), pluginPanels: listPluginPanels(), pluginThemes: listPluginThemes(), lastAction: `${enabled ? 'Enabled' : 'Disabled'} ${plugins.find((plugin) => plugin.id === id)?.name ?? id}`, lastError: undefined })
+    await activateRuntimePlugins(plugins)
+    set({ plugins, ...pluginRuntimeState(), lastAction: `${enabled ? 'Enabled' : 'Disabled'} ${plugins.find((plugin) => plugin.id === id)?.name ?? id}`, lastError: undefined })
   },
   installSamplePlugin: async (id) => {
     const plugins = await window.lightpaper.installSamplePlugin(id) as PluginRecord[]
-    await ensureBundledPluginsActivated(plugins)
-    set({ plugins, pluginCommands: listPluginCommands(), pluginAiPresets: listPluginAiPresets(), pluginAiProviders: listPluginAiProviders(), pluginPanels: listPluginPanels(), pluginThemes: listPluginThemes(), lastAction: `Installed ${plugins.find((plugin) => plugin.id === id)?.name ?? id}`, lastError: undefined })
+    await activateRuntimePlugins(plugins)
+    set({ plugins, ...pluginRuntimeState(), lastAction: `Installed ${plugins.find((plugin) => plugin.id === id)?.name ?? id}`, lastError: undefined })
+  },
+  installLocalPlugin: async (pluginPath) => {
+    try {
+      const plugins = await window.lightpaper.installLocalPlugin(pluginPath) as PluginRecord[]
+      await activateRuntimePlugins(plugins)
+      const installed = plugins.find((plugin) => plugin.external && (!pluginPath || plugin.installedPath === pluginPath))
+      set({ plugins, ...pluginRuntimeState(), lastAction: installed ? `Installed ${installed.name}` : 'Local plugin install canceled', lastError: undefined })
+    } catch (error) {
+      set({ lastError: `Install plugin failed: ${errorMessage(error)}` })
+    }
   },
   uninstallPlugin: async (id) => {
     const target = get().plugins.find((plugin) => plugin.id === id)
     const plugins = await window.lightpaper.uninstallPlugin(id) as PluginRecord[]
-    await ensureBundledPluginsActivated(plugins)
-    set({ plugins, pluginCommands: listPluginCommands(), pluginAiPresets: listPluginAiPresets(), pluginAiProviders: listPluginAiProviders(), pluginPanels: listPluginPanels(), pluginThemes: listPluginThemes(), lastAction: `Uninstalled ${target?.name ?? id}`, lastError: undefined })
+    await activateRuntimePlugins(plugins)
+    set({ plugins, ...pluginRuntimeState(), lastAction: `Uninstalled ${target?.name ?? id}`, lastError: undefined })
   },
   executePluginCommand: async (commandId) => {
     const command = getPluginCommand(commandId)

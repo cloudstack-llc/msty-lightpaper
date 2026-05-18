@@ -24,6 +24,16 @@ describe('plugin theme CSS assets', () => {
     ])).toEqual([])
   })
 
+  it('resolves external local plugin CSS assets by plugin and css file', () => {
+    const assets = cssAssetsForThemes([
+      { id: 'local-theme', label: 'Local Theme', pluginId: 'local.example', pluginName: 'Local Example', cssFile: 'theme.css' },
+    ], [
+      { key: themeCssAssetKey('local.example', 'theme.css'), pluginId: 'local.example', cssFile: 'theme.css', css: '.theme-local-theme { color: red; }' },
+    ])
+
+    expect(assets).toEqual([{ key: 'local.example:theme.css', pluginId: 'local.example', cssFile: 'theme.css', css: '.theme-local-theme { color: red; }' }])
+  })
+
   it('keeps the bundled CSS asset allowlist explicit', () => {
     expect(listBundledThemeCssAssetKeys()).toEqual(['lightpaper.minimal-workspace:minimal-workspace.css', 'lightpaper.theme-gallery:themes.css'])
   })

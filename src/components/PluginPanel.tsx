@@ -1,4 +1,4 @@
-import { Boxes, CheckCircle2, Cpu, Download, Palette, Puzzle, Shield, Sparkles, TerminalSquare, Trash2, X } from 'lucide-react'
+import { Boxes, CheckCircle2, Cpu, Download, FolderInput, Palette, Puzzle, Shield, Sparkles, TerminalSquare, Trash2, X } from 'lucide-react'
 import { useMemo } from 'react'
 import type { PluginRecord } from '@shared/types'
 import { themeClassName } from '@/lib/themes'
@@ -99,7 +99,7 @@ function ContributionSummary({ plugin }: { plugin: PluginRecord }) {
 }
 
 export function PluginPanel({ open, onClose }: { open: boolean; onClose(): void }) {
-  const { plugins, samplePlugins, setPluginEnabled, installSamplePlugin, uninstallPlugin } = useAppStore()
+  const { plugins, samplePlugins, setPluginEnabled, installSamplePlugin, installLocalPlugin, uninstallPlugin } = useAppStore()
   const installedIds = useMemo(() => new Set(plugins.map((plugin) => plugin.id)), [plugins])
   const availableSamples = samplePlugins.filter((plugin) => !installedIds.has(plugin.id))
   const stats = useMemo(() => {
@@ -122,7 +122,10 @@ export function PluginPanel({ open, onClose }: { open: boolean; onClose(): void 
           <div className="flex items-center gap-2 font-semibold"><Puzzle className="h-4 w-4 text-primary" /> Plugins</div>
           <p className="text-xs text-muted-foreground">Installed plugins start empty. Samples live under <code>plugins/samples/</code> and must be installed explicitly.</p>
         </div>
-        <button type="button" className="rounded-md p-2 hover:bg-muted" onClick={onClose}><X className="h-4 w-4" /></button>
+        <div className="flex items-center gap-2">
+          <button type="button" className="rounded-lg border px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted" onClick={() => void installLocalPlugin()}><FolderInput className="mr-1.5 inline h-3.5 w-3.5" />Install local</button>
+          <button type="button" className="rounded-md p-2 hover:bg-muted" onClick={onClose}><X className="h-4 w-4" /></button>
+        </div>
       </div>
 
       <div className="titlebar-no-drag min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-4">

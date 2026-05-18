@@ -9,9 +9,10 @@ function findStyleNode(key: string) {
 
 export function PluginThemeStyles() {
   const pluginThemes = useAppStore((state) => state.pluginThemes)
+  const externalThemeCssAssets = useAppStore((state) => state.pluginThemeCssAssets)
 
   useEffect(() => {
-    const assets = cssAssetsForThemes(pluginThemes)
+    const assets = cssAssetsForThemes(pluginThemes, externalThemeCssAssets)
     const mounted = new Set<string>()
 
     for (const asset of assets) {
@@ -25,7 +26,7 @@ export function PluginThemeStyles() {
     return () => {
       for (const key of mounted) findStyleNode(key)?.remove()
     }
-  }, [pluginThemes])
+  }, [externalThemeCssAssets, pluginThemes])
 
   return null
 }

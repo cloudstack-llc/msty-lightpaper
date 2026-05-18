@@ -1,16 +1,21 @@
-import type { AiActionInput, AiActionOutput, PluginRecord } from '@shared/types'
+import type { AiActionInput, AiActionOutput, ExternalPluginBundle, PluginRecord, PluginThemeCssAsset } from '@shared/types'
 import type { LightPaperCommandContext } from '@shared/plugin-api'
 import { bundledPluginModules } from './bundled-plugin-modules'
+import { compileExternalPluginModules } from './external-plugin-loader'
 import { PluginHost } from './plugin-host'
 
 export const bundledPluginHost = new PluginHost({ modules: bundledPluginModules })
+let externalThemeCssAssets: PluginThemeCssAsset[] = []
 
-export async function activateBundledPlugins(plugins: PluginRecord[]) {
+export async function activateBundledPlugins(plugins: PluginRecord[], externalBundles: ExternalPluginBundle[] = []) {
+  await bundledPluginHost.deactivateAll()
+  bundledPluginHost.setModules({ ...bundledPluginModules, ...compileExternalPluginModules(externalBundles) })
+  externalThemeCssAssets = externalBundles.flatMap((bundle) => bundle.cssAssets ?? [])
   await bundledPluginHost.activatePlugins(plugins)
 }
 
-export async function ensureBundledPluginsActivated(plugins: PluginRecord[]) {
-  await activateBundledPlugins(plugins)
+export async function ensureBundledPluginsActivated(plugins: PluginRecord[], externalBundles: ExternalPluginBundle[] = []) {
+  await activateBundledPlugins(plugins, externalBundles)
 }
 
 export function listPluginCommands() {
@@ -59,6 +64,10 @@ export function listPluginPanels() {
 
 export function listPluginThemes() {
   return bundledPluginHost.listThemes()
+}
+
+export function listExternalThemeCssAssets() {
+  return externalThemeCssAssets
 }
 
 export function listPluginActivationErrors() {

@@ -183,4 +183,11 @@ describe('validatePluginManifest', () => {
     expect(result.issues.map((issue) => issue.path)).toContain('contributes.themes.0.cssFile')
     expect(result.issues.map((issue) => issue.message).join('\n')).toContain('Duplicate contribution id')
   })
+
+  it('rejects unsafe plugin main paths', () => {
+    const result = validatePluginManifest(plugin({ main: '../main.js' }))
+
+    expect(result.ok).toBe(false)
+    expect(result.issues).toContainEqual({ path: 'main', message: 'Plugin main must be a relative .ts, .js, .mjs, or .cjs file path' })
+  })
 })

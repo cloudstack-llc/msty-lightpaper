@@ -20,6 +20,10 @@ function isSafeRelativeCssFile(value: string) {
   return value.endsWith('.css') && !value.startsWith('/') && !value.includes('\\') && value.split('/').every((part) => part.length > 0 && part !== '.' && part !== '..')
 }
 
+function isSafeRelativeMainFile(value: string) {
+  return /\.(cjs|js|mjs|ts)$/.test(value) && !value.startsWith('/') && !value.includes('\\') && value.split('/').every((part) => part.length > 0 && part !== '.' && part !== '..')
+}
+
 function isSafeDataAttribute(value: string) {
   return /^[a-z][a-z0-9-]*$/.test(value)
 }
@@ -47,6 +51,7 @@ export function validatePluginManifest(manifest: PluginManifest): PluginManifest
   if (!isNonEmptyString(manifest.name)) issues.push({ path: 'name', message: 'Plugin name is required' })
   if (!isNonEmptyString(manifest.version)) issues.push({ path: 'version', message: 'Plugin version is required' })
   if (!Array.isArray(manifest.permissions)) issues.push({ path: 'permissions', message: 'Permissions must be an array' })
+  if (manifest.main && !isSafeRelativeMainFile(manifest.main)) issues.push({ path: 'main', message: 'Plugin main must be a relative .ts, .js, .mjs, or .cjs file path' })
 
   for (const permission of manifest.permissions ?? []) {
     if (!knownPermissions.has(permission)) issues.push({ path: 'permissions', message: `Unknown permission "${permission}"` })

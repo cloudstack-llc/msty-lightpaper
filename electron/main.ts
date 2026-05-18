@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, nativeTheme } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, nativeTheme } from 'electron'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { LightPaperDb } from './database'
@@ -6,6 +6,7 @@ import { SecretVault } from './secret-vault'
 import { runAiActionOffline } from './ai-service'
 import { samplePlugins } from './bundled-plugins'
 import { assertInsideWorkspace, chooseWorkspace, createEntry, deleteEntry, readFile, readTree, renameEntry, saveFile } from './fs-service'
+import { readExternalPluginBundle, readLocalPluginPackage } from './local-plugin-loader'
 import { planSamplePluginRegistryRefresh } from './plugin-registry'
 import type { AiActionInput, AppSettings, CreateEntryInput, DeleteEntryInput, RenameEntryInput, SaveFileInput } from '../src/shared/types'
 
@@ -48,10 +49,21 @@ ipcMain.handle('settings:get', () => db.getSettings())
 ipcMain.handle('settings:set', (_event, settings: AppSettings) => { db.setSettings(settings); return settings })
 ipcMain.handle('plugins:list', () => db.listPlugins())
 ipcMain.handle('plugins:samples', () => samplePlugins)
+ipcMain.handle('plugins:externalBundles', () => db.listPlugins().filter((plugin) => plugin.enabled && plugin.external).map(readExternalPluginBundle))
 ipcMain.handle('plugins:installSample', (_event, id: string) => {
   const sample = samplePlugins.find((plugin) => plugin.id === id)
   if (!sample) throw new Error('Sample plugin not found')
   db.upsertPlugin({ ...sample, enabled: false, sample: false })
+  return db.listPlugins()
+})
+ipcMain.handle('plugins:installLocal', async (_event, requestedPath?: string) => {
+  let pluginRoot = requestedPath
+  if (!pluginRoot) {
+    const result = await dialog.showOpenDialog(mainWindow!, { properties: ['openDirectory'], title: 'Install LightPaper plugin folder' })
+    if (result.canceled || !result.filePaths[0]) return db.listPlugins()
+    pluginRoot = result.filePaths[0]
+  }
+  db.upsertPlugin(readLocalPluginPackage(pluginRoot))
   return db.listPlugins()
 })
 ipcMain.handle('plugins:uninstall', (_event, id: string) => { db.removePlugins([id]); return db.listPlugins() })
